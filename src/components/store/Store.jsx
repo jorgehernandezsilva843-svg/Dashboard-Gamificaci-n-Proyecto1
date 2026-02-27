@@ -6,7 +6,7 @@ import confetti from 'canvas-confetti';
 import { supabase } from '../../lib/supabase';
 
 export default function Store() {
-    const { profile, loading } = useGame();
+    const { profile, loading, updateProfile, updateInventory } = useGame();
     const [purchasing, setPurchasing] = useState(false);
     const [gachaResult, setGachaResult] = useState(null);
 
@@ -50,7 +50,10 @@ export default function Store() {
         }
 
         // Deduct coins and theoretically add to inventory
-        // await supabase.from('profiles').update({ coins: profile.coins - 100 }).eq('id', profile.id);
+        if (profile.coins >= 100) {
+            updateProfile({ coins: profile.coins - 100 });
+            updateInventory(seedName, 1, 'seed', rarity);
+        }
 
         confetti({
             particleCount: 100,
@@ -68,7 +71,8 @@ export default function Store() {
             alert("No tienes suficientes monedas!");
             return;
         }
-        // Logic to buy consumable
+        updateProfile({ coins: profile.coins - price });
+        updateInventory(name, 1, 'consumable', 'Común');
         alert(`Compraste: ${name}`);
     };
 
@@ -76,12 +80,12 @@ export default function Store() {
         <div style={{ padding: '2rem', marginLeft: '250px' }}>
             <div className="flex-between" style={{ marginBottom: '2rem' }}>
                 <div>
-                    <h1 className="text-gradient">El Refugio del Jardinero</h1>
-                    <p style={{ color: 'var(--text-secondary)' }}>Compra suministros y semillas misteriosas con tus Monedas.</p>
+                    <h1 className="text-gradient">El Refugio</h1>
+                    <p style={{ color: 'var(--text-secondary)' }}>Tienda de suministros.</p>
                 </div>
-                <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Gem size={18} color="var(--warning)" />
-                    <strong>{profile?.coins || 0} Monedas</strong>
+                <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#000' }}>
+                    <span style={{ color: 'var(--accent-tertiary)' }}>🪙</span>
+                    <strong>{profile?.coins || 0}</strong>
                 </div>
             </div>
 
@@ -144,21 +148,37 @@ export default function Store() {
                         className="glass-panel"
                         style={{
                             position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                            zIndex: 1000, padding: '3rem', textAlign: 'center', border: `2px solid ${gachaResult.color}`,
-                            boxShadow: `0 0 40px ${gachaResult.color}40`, width: '400px'
+                            zIndex: 1010, padding: '2rem', textAlign: 'center', border: `var(--pixel-border)`,
+                            boxShadow: `0 0 40px ${gachaResult.color}80, var(--shadow-retro)`,
+                            width: '90vw', maxWidth: '400px', background: 'var(--bg-secondary)'
                         }}
                     >
-                        <h2 style={{ color: gachaResult.color, marginBottom: '1rem' }}>¡Has obtenido una Mística!</h2>
-                        <div style={{ fontSize: '4rem', margin: '2rem 0' }}>🌱</div>
-                        <h3 style={{ marginBottom: '0.5rem' }}>{gachaResult.seedName}</h3>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Rareza: <strong>{gachaResult.rarity}</strong></p>
-                        <button className="btn btn-primary" onClick={() => setGachaResult(null)}>Genial</button>
+                        <h2 style={{ color: gachaResult.color, marginBottom: '1rem', fontSize: '1.2rem', textShadow: '2px 2px #000' }}>
+                            ¡Wow!
+                        </h2>
+                        <div style={{
+                            fontSize: '4rem', margin: '2rem auto',
+                            background: '#000', width: '100px', height: '100px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            border: `var(--pixel-border-sm)`, borderRadius: '0'
+                        }}>
+                            🌱
+                        </div>
+                        <h3 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                            {gachaResult.seedName}
+                        </h3>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.75rem' }}>
+                            Rareza: <strong style={{ color: gachaResult.color }}>{gachaResult.rarity}</strong>
+                        </p>
+                        <button className="btn" style={{ background: gachaResult.color }} onClick={() => setGachaResult(null)}>
+                            EQUIPAR
+                        </button>
                     </motion.div>
                 )}
             </AnimatePresence>
             {/* Background Overlay */}
             {gachaResult && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 999 }} onClick={() => setGachaResult(null)} />
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000 }} onClick={() => setGachaResult(null)} />
             )}
         </div>
     );

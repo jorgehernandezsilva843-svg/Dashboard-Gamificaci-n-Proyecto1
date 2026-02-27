@@ -55,158 +55,95 @@ export default function Auth() {
 
     return (
         <div style={{
-            position: 'relative',
             minHeight: '100vh',
-            overflow: 'hidden',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#050B14' // Deep night sky
+            padding: '2rem'
         }}>
-            {/* Dynamic Animated Background (Leaves & Dust) */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-                {[...Array(20)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{
-                            y: -100, x: Math.random() * window.innerWidth,
-                            opacity: 0, rotate: 0
-                        }}
-                        animate={{
-                            y: window.innerHeight + 100,
-                            x: Math.random() * window.innerWidth + (Math.random() > 0.5 ? 200 : -200),
-                            opacity: [0, 0.8, 0],
-                            rotate: 360
-                        }}
-                        transition={{
-                            duration: Math.random() * 10 + 10,
-                            repeat: Infinity,
-                            delay: Math.random() * 10,
-                            ease: "linear"
-                        }}
-                        style={{
-                            position: 'absolute',
-                            width: Math.random() > 0.5 ? '15px' : '8px',
-                            height: Math.random() > 0.5 ? '15px' : '8px',
-                            background: Math.random() > 0.5 ? '#10b981' : '#8b5cf6',
-                            borderRadius: Math.random() > 0.5 ? '50% 0 50% 0' : '50%',
-                            filter: 'blur(1px)',
-                            boxShadow: '0 0 10px rgba(16, 185, 129, 0.8)'
-                        }}
-                    />
-                ))}
-                {/* Magical Core Glow */}
-                <div className="animate-pulse-glow" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '60vw', height: '60vw', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 60%)', filter: 'blur(50px)' }} />
-            </div>
-
             <AnimatePresence mode="wait">
                 <motion.div
                     key={isLogin ? 'login' : 'register'}
-                    initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -30 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="glass-card"
                     style={{
-                        width: '100%', maxWidth: '450px', padding: '3rem', zIndex: 1,
-                        background: 'rgba(10, 15, 30, 0.5)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        borderRadius: '24px',
-                        border: '1px solid rgba(16, 185, 129, 0.2)',
-                        boxShadow: '0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05)'
+                        width: '100%', maxWidth: '400px',
+                        display: 'flex', flexDirection: 'column', gap: '1.5rem',
+                        background: 'var(--bg-secondary)',
+                        position: 'relative'
                     }}
                 >
-                    <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                        <motion.h1
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                            style={{
-                                fontSize: '2.5rem', marginBottom: '0.5rem', fontWeight: 800,
-                                background: 'linear-gradient(135deg, #10b981, #8b5cf6)',
-                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-                            }}
-                        >
-                            QuestBloom
-                        </motion.h1>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontStyle: 'italic' }}>
-                            Convierte tu disciplina en un ecosistema legendario.
+                    {/* Retro Corner Accents */}
+                    <div style={{ position: 'absolute', top: '-4px', left: '-4px', width: '8px', height: '8px', background: '#000' }} />
+                    <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', background: '#000' }} />
+                    <div style={{ position: 'absolute', bottom: '-4px', left: '-4px', width: '8px', height: '8px', background: '#000' }} />
+                    <div style={{ position: 'absolute', bottom: '-4px', right: '-4px', width: '8px', height: '8px', background: '#000' }} />
+
+                    <div style={{ textAlign: 'center' }}>
+                        <h1 className="text-gradient" style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>
+                            QUESTBLOOM
+                        </h1>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.65rem' }}>
+                            START YOUR RETRO JOURNEY
                         </p>
                     </div>
 
-                    <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                    <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div className="input-group" style={{ marginBottom: 0 }}>
                             <input
                                 className="input-field"
                                 type="email"
-                                placeholder="Correo Mágico..."
+                                placeholder="PLAYER EMAIL"
                                 value={email}
                                 required
                                 onChange={(e) => setEmail(e.target.value)}
-                                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px' }}
                             />
                         </div>
                         <div className="input-group" style={{ marginBottom: 0 }}>
                             <input
                                 className="input-field"
                                 type="password"
-                                placeholder="Contraseña de Poder..."
+                                placeholder="SECRET PASSCODE"
                                 value={password}
                                 required
                                 onChange={(e) => setPassword(e.target.value)}
-                                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '12px' }}
                             />
                         </div>
 
-                        {error && <p style={{ color: 'var(--danger)', fontSize: '0.85rem', textAlign: 'center' }}>{error}</p>}
-                        {message && <p style={{ color: 'var(--success)', fontSize: '0.85rem', textAlign: 'center' }}>{message}</p>}
+                        {error && <p style={{ color: 'var(--danger)', fontSize: '0.6rem', textAlign: 'center' }}>{error}</p>}
+                        {message && <p style={{ color: 'var(--success)', fontSize: '0.6rem', textAlign: 'center' }}>{message}</p>}
 
                         <button
-                            className="btn"
-                            style={{
-                                width: '100%', marginTop: '1rem', padding: '1rem', borderRadius: '12px', fontSize: '1.1rem',
-                                background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none',
-                                boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)', transition: 'all 0.3s ease', cursor: 'pointer'
-                            }}
+                            className="btn btn-primary"
                             disabled={loading}
                             type="submit"
-                            onMouseOver={(e) => e.target.style.boxShadow = '0 0 40px rgba(16, 185, 129, 0.8)'}
-                            onMouseOut={(e) => e.target.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)'}
+                            style={{ padding: '1rem', marginTop: '0.5rem' }}
                         >
-                            {loading ? 'Invocando...' : (isLogin ? 'Adentrarse al Bosque' : 'Crear Leyenda')}
+                            {loading ? 'WAIT...' : (isLogin ? 'START GAME' : 'NEW SAVE')}
                         </button>
                     </form>
 
-                    <div style={{ marginTop: '1.5rem', textAlign: 'center', position: 'relative' }}>
-                        <div style={{ position: 'absolute', top: '50%', left: 0, width: '100%', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-                        <span style={{ position: 'relative', background: '#0a0f1e', padding: '0 1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>O viaja ligero</span>
-                    </div>
-
                     <button
                         onClick={handleGuestLogin}
-                        className="btn"
-                        style={{
-                            width: '100%', marginTop: '1.5rem', padding: '1rem', borderRadius: '12px',
-                            background: 'rgba(139, 92, 246, 0.1)', color: '#c084fc', border: '1px solid rgba(139, 92, 246, 0.3)',
-                            transition: 'all 0.3s ease', cursor: 'pointer'
-                        }}
-                        onMouseOver={(e) => {
-                            e.target.style.background = 'rgba(139, 92, 246, 0.2)';
-                            e.target.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.5)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.target.style.background = 'rgba(139, 92, 246, 0.1)';
-                            e.target.style.boxShadow = 'none';
-                        }}
+                        className="btn btn-secondary"
                     >
-                        Entrar como Invitado (Modo Demo)
+                        [ GUEST DEMO ]
                     </button>
 
-                    <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
                         <button
                             type="button"
                             onClick={() => { setIsLogin(!isLogin); setError(null); setMessage(null); }}
-                            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}
+                            style={{
+                                background: 'none', border: 'none',
+                                color: 'var(--accent-secondary)', cursor: 'pointer',
+                                fontSize: '0.65rem', fontFamily: 'inherit',
+                                textDecoration: 'underline'
+                            }}
                         >
-                            {isLogin ? "¿Nuevo aventurero? Registrarse" : '¿Ya tienes un legado? Ingresar'}
+                            {isLogin ? "NO SAVE DATA? REGISTER" : 'LOAD EXISTING SAVE'}
                         </button>
                     </div>
                 </motion.div>

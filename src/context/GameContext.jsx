@@ -11,6 +11,13 @@ export function GameProvider({ children, session }) {
     const [loading, setLoading] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
 
+    // Helpers to persist and load local data
+    const saveToLocal = (key, data) => localStorage.setItem(`questbloom_${key}`, JSON.stringify(data));
+    const loadFromLocal = (key, defaultVal) => {
+        const stored = localStorage.getItem(`questbloom_${key}`);
+        return stored ? JSON.parse(stored) : defaultVal;
+    };
+
     useEffect(() => {
         if (session?.user?.id === 'guest-user') {
             setIsGuest(true);
@@ -22,27 +29,32 @@ export function GameProvider({ children, session }) {
     }, [session]);
 
     const loadMockData = () => {
+        console.warn("QuestBloom: Running in LocalStorage/Guest Mode.");
         setLoading(true);
-        setProfile({ id: 'guest-user', email: 'guest@questbloom.com', xp: 450, coins: 150, level: 5 });
-        setTasks([
+
+        // Load from local storage or set initial defaults
+        const localProfile = loadFromLocal('profile', { id: 'guest-user', email: 'guest@questbloom.com', xp: 450, coins: 150, level: 5 });
+        const localTasks = loadFromLocal('tasks', [
             { id: 't1', title: 'Completar prototipo UI', description: 'Terminar el rediseño de la app', is_project: true, subtasks_count: 5, monster_type: 'boss_cronos', monster_name: 'Cronos, el Devorador de Plazos', hp: 500, status: 'pending' },
             { id: 't2', title: 'Hacer ejercicio 30 min', description: 'Cardio ligero', is_project: false, subtasks_count: 0, monster_type: 'daily', monster_name: 'Slime de la Procrastinación', hp: 100, status: 'pending' }
         ]);
-        setGarden([
-            { slot_index: 0, seed_id: 'Margarita Común', stage: 'master', tasks_completed_since_plant: 10, is_wilted: false },
-            { slot_index: 1, seed_id: 'Bonsái Galáctico', stage: 'young', tasks_completed_since_plant: 7, is_wilted: false },
-            { slot_index: 2, stage: 'empty' },
-            { slot_index: 3, stage: 'empty' },
-            { slot_index: 4, stage: 'empty' },
-            { slot_index: 5, stage: 'empty' },
-            { slot_index: 6, stage: 'empty' },
-            { slot_index: 7, stage: 'empty' },
-            { slot_index: 8, stage: 'empty' },
-            { slot_index: 9, stage: 'empty' }
+        const localGarden = loadFromLocal('garden', [
+            { slot_index: 0, seed_id: 'Margarita Común', stage: 'master', tasks_completed_since_plant: 10, is_wilted: false, needs_water: false },
+            { slot_index: 1, seed_id: 'Bonsái Galáctico', stage: 'young', tasks_completed_since_plant: 7, is_wilted: false, needs_water: false },
+            { slot_index: 2, stage: 'empty' }, { slot_index: 3, stage: 'empty' },
+            { slot_index: 4, stage: 'empty' }, { slot_index: 5, stage: 'empty' },
+            { slot_index: 6, stage: 'empty' }, { slot_index: 7, stage: 'empty' },
+            { slot_index: 8, stage: 'empty' }, { slot_index: 9, stage: 'empty' }
         ]);
-        setInventory([
-            { item_type: 'consumable', item_name: 'Agua Destilada', quantity: 5 }
+        const localInventory = loadFromLocal('inventory', [
+            { id: 'inv_water', item_type: 'consumable', item_name: 'Agua Destilada', quantity: 5 },
+            { id: 'inv_fert', item_type: 'consumable', item_name: 'Fertilizante Premium', quantity: 2 }
         ]);
+
+        setProfile(localProfile);
+        setTasks(localTasks);
+        setGarden(localGarden);
+        setInventory(localInventory);
         setLoading(false);
     };
 
@@ -114,14 +126,14 @@ export function GameProvider({ children, session }) {
             status: 'pending'
         };
 
-        if (isGuest) {
-            setTasks([newTask, ...tasks]);
-            return;
-        }
+        const updatedTasks = [newTask, ...tasks];
+        setTasks(updatedTasks);
 
-        const { data, error } = await supabase.from('tasks').insert(newTask).select().single();
-        if (!error && data) {
-            setTasks([data, ...tasks]);
+        if (isGuest) {
+            saveToLocal('tasks', updatedTasks);
+        } else {
+            // async insert avoiding await stall on UI
+            supabase.from('tasks').insert(newTask).then();
         }
     };
 
@@ -133,18 +145,52 @@ export function GameProvider({ children, session }) {
         const xpGained = task.is_project ? 50 : 10;
         const coinsGained = task.is_project ? 20 : 5;
 
+        // Check hyper growth from Pomodoro
+        const hyperGrowth = localStorage.getItem('questbloom_hyper_growth') === 'true';
+        const growthAmount = hyperGrowth ? 2 : 1;
+
+        // Update Garden locally
+        const updatedGarden = garden.map(slot => {
+            if (slot.stage === 'empty' || slot.stage === 'master' || slot.is_wilted) return slot;
+
+            if (slot.needs_water) return slot; // Paused growth due to thirst
+
+            const newProgress = (slot.tasks_completed_since_plant || 0) + growthAmount;
+            let newStage = slot.stage;
+
+            if (newProgress >= 10) newStage = 'master';
+            else if (newProgress >= 6) newStage = 'young';
+            else if (newProgress >= 3) newStage = 'sprout';
+
+            // Random chance to become thirsty
+            const needsWater = Math.random() < 0.25;
+
+            return { ...slot, tasks_completed_since_plant: newProgress, stage: newStage, needs_water: needsWater };
+        });
+
+        setGarden(updatedGarden);
+
         // Update Task locally
-        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: 'completed' } : t));
+        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, status: 'completed' } : t);
+        setTasks(updatedTasks);
 
         // Update Profile locally
         const newXp = profile.xp + xpGained;
         const newCoins = profile.coins + coinsGained;
         const newLevel = Math.floor(newXp / 100) + 1;
-        setProfile({ ...profile, xp: newXp, coins: newCoins, level: newLevel });
+        const updatedProfile = { ...profile, xp: newXp, coins: newCoins, level: newLevel };
+        setProfile(updatedProfile);
 
-        if (!isGuest) {
-            await supabase.from('tasks').update({ status: 'completed', completed_at: new Date() }).eq('id', taskId);
-            await supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id);
+        if (isGuest) {
+            saveToLocal('tasks', updatedTasks);
+            saveToLocal('profile', updatedProfile);
+            saveToLocal('garden', updatedGarden);
+        } else {
+            supabase.from('tasks').update({ status: 'completed', completed_at: new Date() }).eq('id', taskId).then();
+            supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id).then();
+            updatedGarden.forEach(slot => {
+                if (slot.id) supabase.from('garden').update(slot).eq('id', slot.id).then();
+            });
         }
 
         // Handle drops (Gacha box drop chances for seeds etc)
@@ -153,8 +199,56 @@ export function GameProvider({ children, session }) {
         return { xpGained, coinsGained, task };
     };
 
+    const updateProfile = async (updates) => {
+        const updatedProfile = { ...profile, ...updates };
+        setProfile(updatedProfile);
+
+        if (isGuest) {
+            saveToLocal('profile', updatedProfile);
+        } else {
+            await supabase.from('profiles').update(updates).eq('id', profile.id);
+        }
+    };
+
+    const updateInventory = async (itemName, quantityChange, itemType = 'consumable', rarity = null) => {
+        // Simple logic: if item exists, add to quantity. If not, push new.
+        let exists = false;
+        const updatedInv = inventory.map(item => {
+            if (item.item_name === itemName) {
+                exists = true;
+                return { ...item, quantity: item.quantity + quantityChange };
+            }
+            return item;
+        }).filter(item => item.quantity > 0);
+
+        if (!exists && quantityChange > 0) {
+            updatedInv.push({
+                id: `inv_${Date.now()}`,
+                item_name: itemName,
+                quantity: quantityChange,
+                item_type: itemType,
+                rarity: rarity
+            });
+        }
+
+        setInventory(updatedInv);
+
+        if (isGuest) {
+            saveToLocal('inventory', updatedInv);
+        } else {
+            // For true Supabase implementation we'd do an upsert
+            // Oversimplified for logic here:
+            if (!exists) {
+                await supabase.from('inventory').insert({ user_id: profile.id, item_name: itemName, quantity: quantityChange, item_type: itemType, rarity });
+            } else {
+                const target = updatedInv.find(i => i.item_name === itemName);
+                if (target) await supabase.from('inventory').update({ quantity: target.quantity }).eq('user_id', profile.id).eq('item_name', itemName);
+            }
+        }
+    };
+
     return (
-        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, addTask, completeTask, refetch: fetchData }}>
+        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal }}>
             {children}
         </GameContext.Provider>
     );

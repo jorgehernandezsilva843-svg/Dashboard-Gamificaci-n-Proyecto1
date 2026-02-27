@@ -1,38 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+/* -------------------------------------------
+ * QuestBloom: 8-Bit Retro CSS Framework
+ * ------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  
-  --accent-primary: #8b5cf6;
-  --accent-secondary: #c084fc;
-  --accent-glow: rgba(139, 92, 246, 0.4);
-  
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  
-  --glass-bg: rgba(30, 41, 59, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  
-  --shadow-glow: 0 0 20px var(--accent-glow);
-  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  /* Cute Pixel Art Palette (Inspired by Stardew / Classic Pokémon) */
+  --bg-primary: #1E1A29;
+  /* Deep retro night */
+  --bg-secondary: #2B2538;
+  /* Lighter menu background */
+  --bg-tertiary: #4A4057;
+  /* Highlighted panel */
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-full: 9999px;
-  
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --text-primary: #F4F4F4;
+  --text-secondary: #C8C2D4;
+  --text-muted: #857D96;
+
+  --accent-primary: #4ADE80;
+  /* Bright Green / Health / Nature */
+  --accent-secondary: #C084FC;
+  /* Mystic Purple / EXP */
+  --accent-tertiary: #FDE047;
+  /* Gold / Coins */
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --water: #3B82F6;
+
+  /* Hard Edges for Pixel Art feel */
+  --pixel-border: 4px solid #000000;
+  --pixel-border-sm: 2px solid #000000;
+
+  --shadow-retro: 4px 4px 0px 0px rgba(0, 0, 0, 0.5);
+  --shadow-retro-hover: 2px 2px 0px 0px rgba(0, 0, 0, 0.5);
+
+  --transition-fast: 0.1s steps(2, end);
+  --transition-normal: 0.2s steps(4, end);
 }
 
 * {
@@ -42,156 +47,158 @@
 }
 
 body {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Press Start 2P', monospace;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1), transparent 25%);
-  background-attachment: fixed;
-}
-
-/* Glassmorphism Classes */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-}
-
-.glass-card {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-normal);
-}
-
-.glass-card:hover {
-  background: rgba(51, 65, 85, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
+  /* Retro dotted background pattern */
+  background-image: radial-gradient(var(--bg-secondary) 2px, transparent 2px);
+  background-size: 32px 32px;
+  line-height: 1.6;
 }
 
 /* Typography Classes */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  line-height: 1.2;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+  background: linear-gradient(to bottom, #FFFFFF 0%, var(--accent-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+  text-shadow: 2px 2px 0px #000;
 }
 
-/* Base Buttons */
+/* 8-Bit Panels */
+.glass-panel,
+.glass-card {
+  /* Reusing class names but entirely changing appearance */
+  background: var(--bg-secondary);
+  border: var(--pixel-border);
+  box-shadow: inset -4px -4px 0px 0px rgba(0, 0, 0, 0.3), var(--shadow-retro);
+  border-radius: 0;
+  image-rendering: pixelated;
+  padding: 1.5rem;
+}
+
+.glass-card {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.glass-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: inset -4px -4px 0px 0px rgba(0, 0, 0, 0.3), var(--shadow-retro-hover);
+}
+
+/* 8-Bit Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  font-size: 0.95rem;
+  padding: 0.75rem 1.25rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  border: none;
+  border: var(--pixel-border);
+  box-shadow: inset -4px -4px 0px 0px rgba(0, 0, 0, 0.4), var(--shadow-retro);
+  transition: transform 0.1s, box-shadow 0.1s;
   outline: none;
+  background: var(--bg-tertiary);
+  color: white;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #5d516b;
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: inset -2px -2px 0px 0px rgba(0, 0, 0, 0.4), 0px 0px 0px 0px rgba(0, 0, 0, 0.5);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.39);
+  background: var(--accent-primary);
+  color: #000;
+  box-shadow: inset -4px -4px 0px 0px rgba(0, 100, 0, 0.4), var(--shadow-retro);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(1px);
+  background: #22C55E;
 }
 
 .btn-secondary {
   background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--glass-border);
-}
-
-.btn-secondary:hover {
-  background: rgba(71, 85, 105, 0.8);
-  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .btn-danger {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--danger);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: var(--danger);
 }
 
-.btn-danger:hover {
-  background: rgba(239, 68, 68, 0.2);
-}
-
-/* Forms */
+/* Input Fields */
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-label {
-  font-size: 0.875rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
-  font-weight: 500;
 }
 
 .input-field {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--glass-border);
+  background: #000;
+  border: var(--pixel-border);
   color: var(--text-primary);
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-md);
+  padding: 1rem;
   font-family: inherit;
-  font-size: 1rem;
-  transition: all var(--transition-fast);
+  font-size: 0.8rem;
   outline: none;
+  box-shadow: inset 4px 4px 0px 0px rgba(0, 0, 0, 0.5);
 }
 
 .input-field:focus {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
 }
 
 .input-field::placeholder {
   color: var(--text-muted);
 }
 
-/* Animations */
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 var(--accent-glow); }
-  70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+/* Utility Animations */
+@keyframes retroBlink {
+
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .animate-pulse-glow {
-  animation: pulseGlow 2s infinite;
+  /* Replacing smooth pulse with blocky blink */
+  animation: retroBlink 1s infinite steps(1);
 }
 
-/* Layout Classes */
+/* Layout Core Classes */
 .flex-center {
   display: flex;
   align-items: center;
@@ -204,21 +211,39 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
 }
 
-/* Premium Scrollbar */
+.container-with-nav {
+  /* No smooth padding or curves */
+  display: block;
+}
+
+/* 8-Bit Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 16px;
+  height: 16px;
+  border-left: var(--pixel-border);
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: #000;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
+  border: 2px solid #000;
+  box-shadow: inset -2px -2px 0px 0px rgba(0, 0, 0, 0.4);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* Blocky Images / Icons rendering */
+img,
+svg {
+  image-rendering: pixelated;
+}
+
+.pixel-art-sprite {
+  image-rendering: pixelated;
+  /* Use nearest neighbor for crisp scaling */
 }

@@ -2,13 +2,19 @@ import { LogOut, Home, CheckSquare, Flower2, ShoppingBag } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import { useGame } from '../../context/GameContext';
 
 export default function Navbar() {
     const location = useLocation();
+    const { inventory, profile, isGuest } = useGame();
 
     const handleLogout = async () => {
-        // We can add slide-out animation via Framer Motion wrapping the app later.
-        await supabase.auth.signOut();
+        if (isGuest) {
+            localStorage.removeItem('questbloom_guest');
+            window.location.href = '/auth';
+        } else {
+            await supabase.auth.signOut();
+        }
     };
 
     const navItems = [
@@ -65,14 +71,49 @@ export default function Navbar() {
                 })}
             </div>
 
+            {/* Inventory HUD (Pixel Art Top-Right equivalent, placed at bottom of nav for now or fixed top right?) 
+                User requested top right HUD, but since we have a fixed left nav, we'll put it at the bottom of the nav 
+                so it's always visible, or we could make it a fixed floating panel. Let's make it a fixed floating panel 
+                top right over the main content area for better visibility.
+            */}
             <button
                 onClick={handleLogout}
                 className="btn btn-secondary"
-                style={{ width: '100%', justifyContent: 'flex-start' }}
+                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', background: 'transparent', borderTop: 'var(--pixel-border)' }}
             >
-                <LogOut size={18} />
-                <span>Logout</span>
+                <LogOut size={16} />
+                <span>EXIT</span>
             </button>
+
+            {/* Floating Top-Right HUD */}
+            <div className="glass-panel" style={{
+                position: 'fixed',
+                top: '1rem', right: '1rem',
+                display: 'flex', gap: '1rem',
+                padding: '0.5rem 1rem',
+                zIndex: 1000,
+                background: 'var(--bg-secondary)',
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-tertiary)' }}>
+                    <span style={{ fontSize: '1.2rem' }}>🪙</span>
+                    <span style={{ fontSize: '0.8rem' }}>{profile?.coins || 0}</span>
+                </div>
+                <div style={{ width: '2px', background: '#000' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--water)' }}>
+                    <span style={{ fontSize: '1.2rem' }}>💧</span>
+                    <span style={{ fontSize: '0.8rem' }}>{inventory.find(i => i.item_name === 'Agua Destilada')?.quantity || 0}</span>
+                </div>
+                <div style={{ width: '2px', background: '#000' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--success)' }}>
+                    <span style={{ fontSize: '1.2rem' }}>🧪</span>
+                    <span style={{ fontSize: '0.8rem' }}>{inventory.find(i => i.item_name === 'Fertilizante Premium')?.quantity || 0}</span>
+                </div>
+                <div style={{ width: '2px', background: '#000' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-secondary)' }}>
+                    <span style={{ fontSize: '1.2rem' }}>🌱</span>
+                    <span style={{ fontSize: '0.8rem' }}>{inventory.filter(i => i.item_type === 'seed').reduce((acc, curr) => acc + curr.quantity, 0)}</span>
+                </div>
+            </div>
         </nav>
     );
 }

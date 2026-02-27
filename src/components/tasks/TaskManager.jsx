@@ -43,15 +43,16 @@ export default function TaskManager() {
         <div style={{ padding: '2rem', marginLeft: '250px', display: 'flex', gap: '2rem' }}>
 
             {/* Left Column: Tasks List */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <h1 className="text-gradient">Bestiary (Tasks)</h1>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '600px' }}>
+                <h1 className="text-gradient" style={{ textShadow: '2px 2px #000' }}>Bestiary</h1>
+                <p style={{ color: 'var(--text-secondary)', marginTop: '-1rem' }}>Slay tasks to gain XP, Coins, and Items.</p>
 
-                <form onSubmit={handleAddTask} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <form onSubmit={handleAddTask} className="pixel-corners" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--bg-secondary)', border: 'var(--pixel-border)' }}>
                     <div className="input-group">
-                        <label className="input-label">Summon New Monster (Task)</label>
+                        <label className="input-label">SUMMON NEW MONSTER (TASK)</label>
                         <input
                             className="input-field"
-                            placeholder="Task Title..."
+                            placeholder="NAME OF THE BEAST..."
                             value={title}
                             onChange={e => setTitle(e.target.value)}
                             required
@@ -60,7 +61,7 @@ export default function TaskManager() {
                     <div className="input-group">
                         <textarea
                             className="input-field"
-                            placeholder="Description (Optional)"
+                            placeholder="LORE / DESCRIPTION (OPTIONAL)"
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             rows={2}
@@ -68,21 +69,21 @@ export default function TaskManager() {
                     </div>
                     <div className="flex-between">
                         <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center' }}>
-                            <label className="input-label" style={{ marginRight: '1rem' }}>Subtasks Count:</label>
+                            <label className="input-label" style={{ marginRight: '1rem' }}>Difficulty (Subtasks):</label>
                             <input
                                 type="number"
                                 min="0"
                                 className="input-field"
-                                style={{ width: '80px' }}
+                                style={{ width: '60px', padding: '0.5rem' }}
                                 value={subtasksCount}
                                 onChange={e => setSubtasksCount(e.target.value)}
                             />
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
-                                (5+ Subtasks invokes a Boss!)
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
+                                (5+ = BOSS BATTLE)
                             </span>
                         </div>
-                        <button type="submit" className="btn btn-primary">
-                            <Plus size={16} /> Summon
+                        <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
+                            [ INVOCAR ]
                         </button>
                     </div>
                 </form>
@@ -92,37 +93,40 @@ export default function TaskManager() {
                         {tasks.filter(t => t.status === 'pending').map(task => (
                             <motion.div
                                 key={task.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="glass-card"
+                                className="pixel-corners"
                                 style={{
                                     padding: '1rem',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '1rem',
-                                    borderLeft: task.is_project ? '4px solid var(--danger)' : '4px solid var(--accent-primary)'
+                                    background: 'var(--bg-tertiary)',
+                                    border: 'var(--pixel-border-sm)',
+                                    borderLeft: task.is_project ? '8px solid var(--danger)' : '8px solid var(--accent-primary)'
                                 }}
                             >
                                 <button
                                     onClick={() => handleComplete(task.id)}
-                                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                                    className="btn"
+                                    style={{ padding: '0.5rem', fontSize: '1rem' }}
                                     title="Attack / Complete"
                                 >
-                                    <Circle size={24} />
+                                    ⚔️
                                 </button>
                                 <div style={{ flex: 1 }}>
-                                    <h3 style={{ textDecoration: task.status === 'completed' ? 'line-through' : 'none' }}>
+                                    <h3 style={{ textDecoration: task.status === 'completed' ? 'line-through' : 'none', fontSize: '0.9rem', marginBottom: '0.2rem' }}>
                                         {task.title}
                                     </h3>
-                                    {task.description && <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{task.description}</p>}
+                                    {task.description && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>{task.description}</p>}
                                 </div>
-                                <div style={{ textAlign: 'right', fontSize: '0.8rem' }}>
-                                    <div style={{ color: task.is_project ? 'var(--danger)' : 'var(--warning)', display: 'flex', alignItems: 'center', gap: '0.3rem', justifyContent: 'flex-end' }}>
-                                        {task.is_project ? <Skull size={14} /> : <Zap size={14} />}
+                                <div style={{ textAlign: 'right', fontSize: '0.7rem' }}>
+                                    <div style={{ color: task.is_project ? 'var(--danger)' : 'var(--warning)', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.2rem' }}>
+                                        {task.is_project ? '👹' : '👾'}
                                         {task.monster_name}
                                     </div>
-                                    <div style={{ color: 'var(--text-muted)' }}>HP: {task.hp}</div>
+                                    <div style={{ color: 'var(--text-muted)' }}>HP: {task.hp} / {task.hp}</div>
                                 </div>
                             </motion.div>
                         ))}
@@ -136,9 +140,14 @@ export default function TaskManager() {
             </div>
 
             {/* Right Column: Active Combat Arena */}
-            <div style={{ width: '350px' }}>
-                <h2 className="text-gradient" style={{ marginBottom: '1.5rem' }}>Combat Arena</h2>
-                <div className="glass-panel" style={{ height: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ width: '400px', display: 'flex', flexDirection: 'column' }}>
+                <h2 className="text-gradient" style={{ marginBottom: '1.5rem', textShadow: '2px 2px #000' }}>Combat Arena</h2>
+                <div className="pixel-corners" style={{
+                    flex: 1, maxHeight: '500px', display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', position: 'relative',
+                    overflow: 'hidden', background: '#000', border: 'var(--pixel-border)',
+                    backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0V0zm20 20h20v20H20V20z\' fill=\'%230f172a\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")'
+                }}>
 
                     <AnimatePresence>
                         {activeCombat ? (
@@ -161,25 +170,24 @@ export default function TaskManager() {
                                 <div style={{
                                     width: '120px',
                                     height: '120px',
-                                    borderRadius: '50%',
-                                    background: activeCombat.is_project ? 'linear-gradient(135deg, #ef4444, #7f1d1d)' : 'linear-gradient(135deg, #8b5cf6, #4c1d95)',
+                                    background: 'transparent',
                                     margin: '0 auto 1.5rem',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    boxShadow: activeCombat.is_project ? '0 0 30px rgba(239, 68, 68, 0.5)' : 'var(--shadow-glow)',
-                                    fontSize: '3rem'
+                                    fontSize: '6rem',
+                                    filter: activeCombat.is_project ? 'drop-shadow(0 0 20px rgba(239, 68, 68, 0.8))' : 'drop-shadow(0 0 10px rgba(139, 92, 246, 0.5))'
                                 }}>
                                     {activeCombat.is_project ? '👹' : '👾'}
                                 </div>
                                 <h3>{activeCombat.monster_name}</h3>
                                 <div style={{
                                     width: '100%',
-                                    height: '10px',
-                                    background: 'var(--glass-border)',
-                                    borderRadius: '5px',
+                                    height: '12px',
+                                    background: '#333',
+                                    border: '2px solid #555',
                                     marginTop: '1rem',
-                                    overflow: 'hidden'
+                                    position: 'relative'
                                 }}>
                                     <motion.div
                                         initial={{ width: '100%' }}
@@ -191,8 +199,9 @@ export default function TaskManager() {
                                 <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Taking Damage...</p>
                             </motion.div>
                         ) : (
-                            <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                                <p>Select a task to enter combat</p>
+                            <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                                <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🛡️</div>
+                                <p>AWAITING COMBAT</p>
                             </div>
                         )}
                     </AnimatePresence>
