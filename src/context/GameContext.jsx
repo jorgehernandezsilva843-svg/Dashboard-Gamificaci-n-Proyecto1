@@ -109,7 +109,7 @@ export function GameProvider({ children, session }) {
             monster_name: monster.name,
             monster_type: isProject ? 'boss' : 'daily',
             monster_color: monster.color,
-            monster_emoji: monster.emoji,
+            monster_sprite: monster.sprite,
             monster_style: monster.style,
             hp: hp,
             status: 'pending'

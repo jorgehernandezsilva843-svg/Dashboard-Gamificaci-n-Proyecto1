@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
+import PixelSprite from '../PixelSprite';
 
 export default function Navbar() {
     const location = useLocation();
@@ -95,22 +96,22 @@ export default function Navbar() {
                 background: 'var(--bg-secondary)',
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-tertiary)' }}>
-                    <span style={{ fontSize: '1.2rem' }}>🪙</span>
+                    <PixelSprite templateName="coin" baseColor="#fbbf24" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{profile?.coins || 0}</span>
                 </div>
                 <div style={{ width: '2px', background: '#000' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--water)' }}>
-                    <span style={{ fontSize: '1.2rem' }}>💧</span>
+                    <PixelSprite templateName="waterDrop" baseColor="#3b82f6" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{inventory.find(i => i.item_name === 'Agua Destilada')?.quantity || 0}</span>
                 </div>
                 <div style={{ width: '2px', background: '#000' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--success)' }}>
-                    <span style={{ fontSize: '1.2rem' }}>🧪</span>
+                    <PixelSprite templateName="fertilizerBag" baseColor="#10b981" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{inventory.find(i => i.item_name === 'Fertilizante Premium')?.quantity || 0}</span>
                 </div>
                 <div style={{ width: '2px', background: '#000' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-secondary)' }}>
-                    <span style={{ fontSize: '1.2rem' }}>🌱</span>
+                    <PixelSprite templateName="seed" baseColor="#a78bfa" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{inventory.filter(i => i.item_type === 'seed').reduce((acc, curr) => acc + curr.quantity, 0)}</span>
                 </div>
             </div>

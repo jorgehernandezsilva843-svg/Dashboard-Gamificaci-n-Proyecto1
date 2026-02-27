@@ -29,9 +29,9 @@
   --danger: #EF4444;
   --water: #3B82F6;
 
-  /* Hard Edges for Pixel Art feel */
-  --pixel-border: 4px solid #000000;
-  --pixel-border-sm: 2px solid #000000;
+  /* Hard Edges for Pixel Art feel - Double solid lines */
+  --pixel-border: 6px double #000000;
+  --pixel-border-sm: 4px double #000000;
 
   --shadow-retro: 4px 4px 0px 0px rgba(0, 0, 0, 0.5);
   --shadow-retro-hover: 2px 2px 0px 0px rgba(0, 0, 0, 0.5);

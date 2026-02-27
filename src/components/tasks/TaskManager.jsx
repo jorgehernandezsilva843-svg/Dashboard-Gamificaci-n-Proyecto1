@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { Plus, CheckCircle, Circle, Skull, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PixelSprite from '../PixelSprite';
 
 export default function TaskManager() {
     const { tasks, addTask, completeTask } = useGame();
@@ -123,7 +124,9 @@ export default function TaskManager() {
                                 </div>
                                 <div style={{ textAlign: 'right', fontSize: '0.7rem' }}>
                                     <div style={{ color: task.monster_color || (task.is_project ? 'var(--danger)' : 'var(--warning)'), display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.2rem' }}>
-                                        <span style={{ filter: `drop-shadow(0 0 5px ${task.monster_color || '#fff'})` }}>{task.monster_emoji || (task.is_project ? '👹' : '👾')}</span>
+                                        <span style={{ filter: `drop-shadow(0 0 5px ${task.monster_color || '#fff'})` }}>
+                                            <PixelSprite templateName={task.monster_sprite || (task.is_project ? 'boss_default' : 'slime')} baseColor={task.monster_color || '#fff'} scale={0.5} />
+                                        </span>
                                         {task.monster_name}
                                     </div>
                                     <div style={{ color: 'var(--text-muted)' }}>HP: {task.hp} / {task.hp}</div>
@@ -175,10 +178,9 @@ export default function TaskManager() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '6rem',
                                     filter: `drop-shadow(0 0 15px ${activeCombat.monster_color || (activeCombat.is_project ? 'rgba(239, 68, 68, 0.8)' : 'rgba(139, 92, 246, 0.5)')})`
                                 }}>
-                                    {activeCombat.monster_emoji || (activeCombat.is_project ? '👹' : '👾')}
+                                    <PixelSprite templateName={activeCombat.monster_sprite || (activeCombat.is_project ? 'boss_default' : 'slime')} baseColor={activeCombat.monster_color || '#fff'} scale={2} />
                                 </div>
                                 <h3>{activeCombat.monster_name}</h3>
                                 <div style={{

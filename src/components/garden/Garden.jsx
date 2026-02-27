@@ -3,6 +3,7 @@ import { useGame } from '../../context/GameContext';
 import { Flower2, Beaker, Sprout, Trees } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEED_CATALOG } from '../../data/catalog';
+import PixelSprite from '../PixelSprite';
 
 export default function Garden() {
     const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest } = useGame();
@@ -44,46 +45,44 @@ export default function Garden() {
 
     // Helper to map stage to an icon/emoji
     const getPlantVisual = (stage, isWilted, seedId) => {
-        if (isWilted) return <span style={{ filter: 'grayscale(100%)', opacity: 0.5, fontSize: '2.5rem' }}>🥀</span>;
+        if (isWilted) return <div style={{ filter: 'grayscale(100%)', opacity: 0.5 }}><PixelSprite templateName="flower" baseColor="#555555" scale={2} /></div>;
 
-        let visual = '🌱';
+        let visualTemplate = 'seed';
         let color = '#ffffff';
         let isMaster = stage === 'master';
 
         if (seedId) {
             const seedInfo = SEED_CATALOG.find(s => s.name === seedId);
             if (seedInfo && seedInfo.sprites && seedInfo.sprites[stage]) {
-                visual = seedInfo.sprites[stage];
+                visualTemplate = seedInfo.sprites[stage];
                 color = seedInfo.color;
             }
         } else {
             // Fallback
             switch (stage) {
-                case 'seed': visual = '🌰'; break;
-                case 'sprout': visual = '🌱'; break;
-                case 'young': visual = '🪴'; break;
-                case 'master': visual = '🌸'; break;
+                case 'seed': visualTemplate = 'seed'; break;
+                case 'sprout': visualTemplate = 'sprout'; break;
+                case 'young': visualTemplate = 'sprout'; break;
+                case 'master': visualTemplate = 'flower'; break;
             }
         }
 
-        let fontSize = '2rem';
-        if (stage === 'sprout') fontSize = '2.5rem';
-        if (stage === 'young') fontSize = '3.2rem';
-        if (stage === 'master') fontSize = '4rem';
+        let scale = 1;
+        if (stage === 'sprout') scale = 1.25;
+        if (stage === 'young') scale = 1.75;
+        if (stage === 'master') scale = 2.5;
 
         return (
-            <motion.span
+            <motion.div
                 animate={isMaster ? { y: [0, -5, 0] } : {}}
                 transition={isMaster ? { repeat: Infinity, duration: 2, ease: "easeInOut" } : {}}
                 style={{
-                    fontSize,
                     display: 'inline-block',
-                    textShadow: isMaster ? `0 0 15px ${color}, 2px 2px 0px #000` : `2px 2px 0px #000`,
-                    filter: isMaster ? `drop-shadow(0 0 2px ${color})` : 'none'
+                    filter: isMaster ? `drop-shadow(0 0 5px ${color}) drop-shadow(0 0 15px ${color})` : `drop-shadow(2px 2px 0px #000)`
                 }}
             >
-                {visual}
-            </motion.span>
+                <PixelSprite templateName={visualTemplate} baseColor={color} scale={scale} />
+            </motion.div>
         );
     };
 
@@ -157,7 +156,9 @@ export default function Garden() {
                             {/* Water icon indicator if needed */}
                             {!isEmpty && slot.needs_water && (
                                 <div style={{ position: 'absolute', top: 5, right: 5, cursor: 'help' }} title="¡Necesita agua o morirá pronto!">
-                                    <span style={{ fontSize: '1.5rem' }} className="animate-pulse-glow">💧</span>
+                                    <div className="animate-pulse-glow">
+                                        <PixelSprite templateName="waterDrop" baseColor="#3B82F6" scale={0.6} />
+                                    </div>
                                 </div>
                             )}
 

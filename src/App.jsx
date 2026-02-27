@@ -12,6 +12,7 @@ import Garden from './components/garden/Garden';
 import Store from './components/store/Store';
 import PomodoroTimer from './components/PomodoroTimer';
 import { GameProvider } from './context/GameContext';
+import PixelSprite from './components/PixelSprite';
 
 // 8-Bit Runner Transition Component
 const RunnerTransition = ({ isVisible, direction = 'right' }) => (
@@ -29,7 +30,7 @@ const RunnerTransition = ({ isVisible, direction = 'right' }) => (
           fontSize: '4rem',
         }}
       >
-        🏃‍♂️
+        <PixelSprite templateName="goblin" baseColor="#4ade80" scale={3} />
       </motion.div>
     )}
   </AnimatePresence>

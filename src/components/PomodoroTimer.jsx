@@ -20,6 +20,13 @@ export default function PomodoroTimer() {
     const audioRef = useRef(null);
     const timerRef = useRef(null);
 
+    // Set Audio Volume to 30%
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.volume = 0.3;
+        }
+    }, []);
+
     // Save timer state to localStorage periodically if active to prevent complete wipe on refresh
     useEffect(() => {
         if (isActive) {
@@ -116,7 +123,18 @@ export default function PomodoroTimer() {
                             <div style={{ fontSize: '0.8rem', color: mode === 'work' ? 'var(--accent-primary)' : 'var(--water)', marginBottom: '0.5rem' }}>
                                 {mode === 'work' ? 'ESTUDIO INTENSO (2x Crecimiento)' : 'DESCANSO ZEN'}
                             </div>
-                            <div style={{ fontSize: '3rem', fontWeight: 'bold', textShadow: '2px 2px #000', color: mode === 'work' ? 'white' : 'var(--water)' }}>
+                            <div style={{
+                                fontSize: '3.5rem',
+                                fontWeight: 'bold',
+                                color: mode === 'work' ? '#ff0000' : '#00ff00',
+                                textShadow: mode === 'work' ? '0 0 10px #ff0000' : '0 0 10px #00ff00',
+                                background: '#111',
+                                border: 'var(--pixel-border-sm)',
+                                padding: '1rem 0',
+                                fontFamily: '"Press Start 2P", monospace',
+                                display: 'inline-block',
+                                width: '100%'
+                            }}>
                                 {formatTime(timeLeft)}
                             </div>
                         </div>
@@ -136,10 +154,10 @@ export default function PomodoroTimer() {
                             </button>
                         </div>
 
-                        {/* Dummy 8-bit Audio Element */}
+                        {/* Dummy 8-bit / Lo-Fi Audio Element */}
                         <audio
                             ref={audioRef}
-                            src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" // Placeholder for an actual lofi/8bit track
+                            src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" // Royalty free lofi hip hop track
                             loop
                             muted={isMuted}
                         />
