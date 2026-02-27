@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
 import { Flower2, Beaker, Sprout, Trees } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SEED_CATALOG } from '../../data/catalog';
 
 export default function Garden() {
     const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest } = useGame();
@@ -42,15 +43,48 @@ export default function Garden() {
     };
 
     // Helper to map stage to an icon/emoji
-    const getPlantVisual = (stage, isWilted) => {
+    const getPlantVisual = (stage, isWilted, seedId) => {
         if (isWilted) return <span style={{ filter: 'grayscale(100%)', opacity: 0.5, fontSize: '2.5rem' }}>🥀</span>;
-        switch (stage) {
-            case 'seed': return <span style={{ fontSize: '2rem' }}>🌰</span>;
-            case 'sprout': return <span style={{ fontSize: '2.5rem' }}>🌱</span>;
-            case 'young': return <span style={{ fontSize: '3rem' }}>🪴</span>;
-            case 'master': return <span style={{ fontSize: '3.5rem', textShadow: '0 0 10px var(--accent-secondary)' }}>🌸</span>;
-            default: return null;
+
+        let visual = '🌱';
+        let color = '#ffffff';
+        let isMaster = stage === 'master';
+
+        if (seedId) {
+            const seedInfo = SEED_CATALOG.find(s => s.name === seedId);
+            if (seedInfo && seedInfo.sprites && seedInfo.sprites[stage]) {
+                visual = seedInfo.sprites[stage];
+                color = seedInfo.color;
+            }
+        } else {
+            // Fallback
+            switch (stage) {
+                case 'seed': visual = '🌰'; break;
+                case 'sprout': visual = '🌱'; break;
+                case 'young': visual = '🪴'; break;
+                case 'master': visual = '🌸'; break;
+            }
         }
+
+        let fontSize = '2rem';
+        if (stage === 'sprout') fontSize = '2.5rem';
+        if (stage === 'young') fontSize = '3.2rem';
+        if (stage === 'master') fontSize = '4rem';
+
+        return (
+            <motion.span
+                animate={isMaster ? { y: [0, -5, 0] } : {}}
+                transition={isMaster ? { repeat: Infinity, duration: 2, ease: "easeInOut" } : {}}
+                style={{
+                    fontSize,
+                    display: 'inline-block',
+                    textShadow: isMaster ? `0 0 15px ${color}, 2px 2px 0px #000` : `2px 2px 0px #000`,
+                    filter: isMaster ? `drop-shadow(0 0 2px ${color})` : 'none'
+                }}
+            >
+                {visual}
+            </motion.span>
+        );
     };
 
     const getStageName = (stage) => {
@@ -142,7 +176,7 @@ export default function Garden() {
                                         transition={{ type: 'spring' }}
                                         style={{ marginBottom: '0.5rem', zIndex: 1 }}
                                     >
-                                        {getPlantVisual(slot.stage, slot.is_wilted)}
+                                        {getPlantVisual(slot.stage, slot.is_wilted, slot.seed_id)}
                                     </motion.div>
                                     <h4 style={{ color: slot.is_wilted ? 'var(--danger)' : 'var(--text-primary)', fontSize: '0.75rem', textAlign: 'center', zIndex: 1, textShadow: '1px 1px #000' }}>
                                         {slot.seed_id || 'Unknown Plant'}

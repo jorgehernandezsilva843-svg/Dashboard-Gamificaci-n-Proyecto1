@@ -4,6 +4,7 @@ import { Package, Droplets, Sparkles, Gem } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { supabase } from '../../lib/supabase';
+import { getRandomSeed } from '../../data/catalog';
 
 export default function Store() {
     const { profile, loading, updateProfile, updateInventory } = useGame();
@@ -22,32 +23,11 @@ export default function Store() {
         // Simulate network/animation delay
         await new Promise(r => setTimeout(r, 1000));
 
-        const rand = Math.random() * 100;
-        let rarity = '';
-        let seedName = '';
-        let color = '';
-
-        if (rand <= 0.1) {
-            rarity = 'Mercado Negro';
-            seedName = 'Árbol del Tiempo Suspendido';
-            color = '#ef4444'; // Red/Galaxy
-        } else if (rand <= 5) { // 4.9 + 0.1
-            rarity = 'Exótica';
-            seedName = 'Cactus de Plasma';
-            color = '#f59e0b'; // Gold
-        } else if (rand <= 25) { // 20 + 5
-            rarity = 'Épica';
-            seedName = 'Girasol de Oro de 24k';
-            color = '#c084fc'; // Purple
-        } else if (rand <= 50) { // 25 + 25
-            rarity = 'Rara';
-            seedName = 'Bonsái de Enebro';
-            color = '#3b82f6'; // Blue
-        } else { // remaining 50%
-            rarity = 'Común';
-            seedName = 'Margarita Blanca';
-            color = '#94a3b8'; // Grey
-        }
+        // Pick from catalog
+        const seed = getRandomSeed();
+        const rarity = seed.rarity;
+        const seedName = seed.name;
+        const color = seed.color;
 
         // Deduct coins and theoretically add to inventory
         if (profile.coins >= 100) {

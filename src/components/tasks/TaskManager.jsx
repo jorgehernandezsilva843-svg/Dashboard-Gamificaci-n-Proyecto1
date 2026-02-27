@@ -122,8 +122,8 @@ export default function TaskManager() {
                                     {task.description && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>{task.description}</p>}
                                 </div>
                                 <div style={{ textAlign: 'right', fontSize: '0.7rem' }}>
-                                    <div style={{ color: task.is_project ? 'var(--danger)' : 'var(--warning)', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.2rem' }}>
-                                        {task.is_project ? '👹' : '👾'}
+                                    <div style={{ color: task.monster_color || (task.is_project ? 'var(--danger)' : 'var(--warning)'), display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.2rem' }}>
+                                        <span style={{ filter: `drop-shadow(0 0 5px ${task.monster_color || '#fff'})` }}>{task.monster_emoji || (task.is_project ? '👹' : '👾')}</span>
                                         {task.monster_name}
                                     </div>
                                     <div style={{ color: 'var(--text-muted)' }}>HP: {task.hp} / {task.hp}</div>
@@ -167,7 +167,7 @@ export default function TaskManager() {
                                 transition={{ duration: 0.5 }}
                                 style={{ textAlign: 'center' }}
                             >
-                                <div style={{
+                                <div className={activeCombat.monster_style || ''} style={{
                                     width: '120px',
                                     height: '120px',
                                     background: 'transparent',
@@ -176,9 +176,9 @@ export default function TaskManager() {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     fontSize: '6rem',
-                                    filter: activeCombat.is_project ? 'drop-shadow(0 0 20px rgba(239, 68, 68, 0.8))' : 'drop-shadow(0 0 10px rgba(139, 92, 246, 0.5))'
+                                    filter: `drop-shadow(0 0 15px ${activeCombat.monster_color || (activeCombat.is_project ? 'rgba(239, 68, 68, 0.8)' : 'rgba(139, 92, 246, 0.5)')})`
                                 }}>
-                                    {activeCombat.is_project ? '👹' : '👾'}
+                                    {activeCombat.monster_emoji || (activeCombat.is_project ? '👹' : '👾')}
                                 </div>
                                 <h3>{activeCombat.monster_name}</h3>
                                 <div style={{

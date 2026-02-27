@@ -247,3 +247,166 @@ svg {
   image-rendering: pixelated;
   /* Use nearest neighbor for crisp scaling */
 }
+
+/* Custom Monster Animations */
+@keyframes animBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bounce {
+  animation: animBounce 1s infinite steps(2);
+}
+
+@keyframes animShake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px) rotate(-5deg);
+  }
+
+  75% {
+    transform: translateX(5px) rotate(5deg);
+  }
+}
+
+.shake {
+  animation: animShake 0.5s infinite steps(2);
+}
+
+@keyframes animPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.pulse {
+  animation: animPulse 1.5s infinite steps(2);
+}
+
+@keyframes animFloatTransparent {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-15px);
+    opacity: 0.3;
+  }
+}
+
+.float_transparent {
+  animation: animFloatTransparent 3s infinite steps(3);
+  opacity: 0.6;
+}
+
+@keyframes animWobble {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-10deg);
+  }
+
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.wobble {
+  animation: animWobble 0.8s infinite steps(2);
+}
+
+/* Boss specific styles */
+@keyframes animBossClock {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.boss_clock {
+  animation: animBossClock 10s infinite linear steps(12);
+  filter: drop-shadow(0 0 20px #fbbf24) drop-shadow(0 0 40px #b45309) !important;
+}
+
+@keyframes animBossMulti {
+
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+
+  50% {
+    transform: scale(1.05) translateY(-5px);
+  }
+}
+
+.boss_multi {
+  animation: animBossMulti 2s infinite steps(4);
+  text-shadow: -40px 30px 0px rgba(16, 185, 129, 0.5), 40px 30px 0px rgba(16, 185, 129, 0.5);
+  /* extra heads impression */
+}
+
+@keyframes animBossFire {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 -10px 10px #ef4444) drop-shadow(0 10px 20px #b91c1c) !important;
+    transform: scale(1);
+  }
+
+  50% {
+    filter: drop-shadow(0 -20px 20px #ef4444) drop-shadow(0 5px 10px #b91c1c) !important;
+    transform: scale(1.02);
+  }
+}
+
+.boss_fire {
+  animation: animBossFire 1s infinite steps(3);
+}
+
+@keyframes animBossRock {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(5px) scale(0.98);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.boss_rock {
+  animation: animBossRock 3s infinite steps(2);
+  filter: drop-shadow(8px 8px 0px #1e293b) !important;
+}

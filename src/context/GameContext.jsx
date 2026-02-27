@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { getRandomDailyMonster, getRandomBossMonster } from '../data/bestiary';
 
 const GameContext = createContext();
 
@@ -81,35 +82,19 @@ export function GameProvider({ children, session }) {
     };
 
     const addTask = async (taskData) => {
-        // Generate monster logic based on project size
         const isProject = taskData.subtasks_count >= 5;
 
-        const dailyMonsters = [
-            'Slime de la Procrastinación',
-            'Goblin del Desorden',
-            'Gárgola de la Indecisión',
-            'Espectro de la Notificación',
-            'Mimic de la Falsa Urgencia'
-        ];
-
-        let monsterName = '';
-        let monsterType = 'daily';
+        let monster;
         let hp = 100;
 
         if (isProject) {
-            // Simplification: assign random boss for now if it's a project
-            const bosses = [
-                { name: 'Cronos, el Devorador de Plazos', type: 'boss_cronos', hp: 500 },
-                { name: 'La Hidra de los Pendientes Infinitos', type: 'boss_hydra', hp: 500 },
-                { name: 'El Dragón del Burnout (Agotamiento)', type: 'boss_dragon', hp: 800 },
-                { name: 'El Titán del Gran Compromiso', type: 'boss_titan', hp: 1000 }
-            ];
-            const boss = bosses[Math.floor(Math.random() * bosses.length)];
-            monsterName = boss.name;
-            monsterType = boss.type;
-            hp = boss.hp;
+            monster = getRandomBossMonster();
+            // Assign HP based on some boss logic or generic 500
+            if (monster.id === 'boss_titan') hp = 1000;
+            else if (monster.id === 'boss_dragon') hp = 800;
+            else hp = 500;
         } else {
-            monsterName = dailyMonsters[Math.floor(Math.random() * dailyMonsters.length)];
+            monster = getRandomDailyMonster();
             hp = 100;
         }
 
@@ -120,8 +105,12 @@ export function GameProvider({ children, session }) {
             subtasks_count: taskData.subtasks_count,
             user_id: session.user.id,
             is_project: isProject,
-            monster_name: monsterName,
-            monster_type: monsterType,
+            monster_id: monster.id,
+            monster_name: monster.name,
+            monster_type: isProject ? 'boss' : 'daily',
+            monster_color: monster.color,
+            monster_emoji: monster.emoji,
+            monster_style: monster.style,
             hp: hp,
             status: 'pending'
         };
