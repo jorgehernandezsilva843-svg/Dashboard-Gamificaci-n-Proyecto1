@@ -1,6 +1,7 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Components
 import Auth from './components/auth/Auth';
@@ -15,8 +16,16 @@ import { GameProvider } from './context/GameContext';
 function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
+    // Check if user clicked Guest Mode
+    if (localStorage.getItem('questbloom_guest') === 'true') {
+      setSession({ user: { id: 'guest-user', email: 'guest@questbloom.com' } });
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -43,32 +52,43 @@ function App() {
     <GameProvider session={session}>
       {session && <Navbar />}
       <main className={session ? "container-with-nav" : "container-full"}>
-        <Routes>
-          <Route
-            path="/"
-            element={session ? <Navigate to="/dashboard" /> : <Navigate to="/auth" />}
-          />
-          <Route
-            path="/auth"
-            element={!session ? <Auth /> : <Navigate to="/dashboard" />}
-          />
-          <Route
-            path="/dashboard"
-            element={session ? <Dashboard session={session} /> : <Navigate to="/auth" />}
-          />
-          <Route
-            path="/tasks"
-            element={session ? <TaskManager /> : <Navigate to="/auth" />}
-          />
-          <Route
-            path="/garden"
-            element={session ? <Garden /> : <Navigate to="/auth" />}
-          />
-          <Route
-            path="/store"
-            element={session ? <Store /> : <Navigate to="/auth" />}
-          />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={session ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={session ? { opacity: 0, scale: 1.05 } : { opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} // Portal snap feel
+            style={{ width: '100%', height: '100%' }}
+          >
+            <Routes>
+              <Route
+                path="/"
+                element={session ? <Navigate to="/dashboard" /> : <Navigate to="/auth" />}
+              />
+              <Route
+                path="/auth"
+                element={!session ? <Auth /> : <Navigate to="/dashboard" />}
+              />
+              <Route
+                path="/dashboard"
+                element={session ? <Dashboard session={session} /> : <Navigate to="/auth" />}
+              />
+              <Route
+                path="/tasks"
+                element={session ? <TaskManager /> : <Navigate to="/auth" />}
+              />
+              <Route
+                path="/garden"
+                element={session ? <Garden /> : <Navigate to="/auth" />}
+              />
+              <Route
+                path="/store"
+                element={session ? <Store /> : <Navigate to="/auth" />}
+              />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
       </main>
       {session && <FocusPlayer />}
     </GameProvider>

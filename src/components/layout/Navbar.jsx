@@ -33,7 +33,7 @@ export default function Navbar() {
             borderLeft: 'none'
         }}>
             <div style={{ marginBottom: '3rem' }}>
-                <h2 className="text-gradient">Proyecto U1</h2>
+                <h2 className="text-gradient">QuestBloom</h2>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
