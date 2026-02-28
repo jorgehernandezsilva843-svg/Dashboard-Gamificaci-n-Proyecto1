@@ -210,7 +210,13 @@ export function GameProvider({ children, session }) {
             await Promise.all([
                 supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId),
                 supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id),
-                ...updatedGarden.map(slot => slot.id ? supabase.from('garden').update(slot).eq('id', slot.id) : Promise.resolve())
+                ...updatedGarden.map(slot => {
+                    if (slot.id) {
+                        const { id, user_id, planted_at, ...updateData } = slot;
+                        return supabase.from('garden').update(updateData).eq('id', slot.id);
+                    }
+                    return Promise.resolve();
+                })
             ]);
         }
 
@@ -283,7 +289,11 @@ export function GameProvider({ children, session }) {
                 await supabase.from('inventory').insert({ user_id: profile.id, item_name: itemName, quantity: quantityChange, item_type: itemType, rarity });
             } else {
                 const target = updatedInv.find(i => i.item_name === itemName);
-                if (target) await supabase.from('inventory').update({ quantity: target.quantity }).eq('user_id', profile.id).eq('item_name', itemName);
+                if (target) {
+                    await supabase.from('inventory').update({ quantity: target.quantity }).eq('user_id', profile.id).eq('item_name', itemName);
+                } else {
+                    await supabase.from('inventory').delete().eq('user_id', profile.id).eq('item_name', itemName);
+                }
             }
         }
     };
@@ -312,7 +322,13 @@ export function GameProvider({ children, session }) {
             saveToLocal('garden', updatedGarden);
         } else {
             await Promise.all(
-                updatedGarden.map(slot => slot.id ? supabase.from('garden').update(slot).eq('id', slot.id) : Promise.resolve())
+                updatedGarden.map(slot => {
+                    if (slot.id) {
+                        const { id, user_id, planted_at, ...updateData } = slot;
+                        return supabase.from('garden').update(updateData).eq('id', slot.id);
+                    }
+                    return Promise.resolve();
+                })
             );
         }
     };

@@ -10,16 +10,16 @@ export default function Garden() {
     const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
     const [showFusionModal, setShowFusionModal] = useState(false);
 
-    const handleSlotClick = (slotIndex) => {
+    const handleSlotClick = async (slotIndex) => {
         const slot = garden.find(g => g.slot_index === slotIndex);
         if (!slot) return;
 
         if (slot.needs_water) {
             const waterItem = inventory.find(i => i.item_name === 'Agua Destilada');
             if (waterItem && waterItem.quantity > 0) {
-                updateInventory('Agua Destilada', -1, 'consumable', 'Común');
+                await updateInventory('Agua Destilada', -1, 'consumable', 'Común');
                 const updatedGarden = garden.map(g => g.slot_index === slotIndex ? { ...g, needs_water: false } : g);
-                syncGarden(updatedGarden);
+                await syncGarden(updatedGarden);
             } else {
                 alert('¡No tienes Agua Destilada! Compra en la tienda.');
             }
@@ -33,19 +33,19 @@ export default function Garden() {
                 return;
             }
             const seedToPlant = seeds[0];
-            updateInventory(seedToPlant.item_name, -1, 'seed', seedToPlant.rarity);
+            await updateInventory(seedToPlant.item_name, -1, 'seed', seedToPlant.rarity);
 
             const updatedGarden = garden.map(g => g.slot_index === slotIndex ? {
                 ...g, stage: 'seed', seed_id: seedToPlant.item_name, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
             } : g);
-            syncGarden(updatedGarden);
+            await syncGarden(updatedGarden);
         }
     };
 
-    const handleRemovePlant = (e, slotIndex) => {
+    const handleRemovePlant = async (e, slotIndex) => {
         e.stopPropagation();
         if (window.confirm('¿Estás seguro de arrancar esta planta? Se perderá para siempre y no podrás recuperarla.')) {
-            removePlant(slotIndex);
+            await removePlant(slotIndex);
         }
     };
 
