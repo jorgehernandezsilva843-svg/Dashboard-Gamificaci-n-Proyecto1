@@ -75,3 +75,9 @@ export const getRandomSeed = () => {
 
     return pool[Math.floor(Math.random() * pool.length)];
 };
+
+export const getRandomSeedByRarity = (targetRarity) => {
+    const pool = SEED_CATALOG.filter(s => s.rarity === targetRarity);
+    if (pool.length === 0) return SEED_CATALOG[0]; // Fallback
+    return pool[Math.floor(Math.random() * pool.length)];
+};

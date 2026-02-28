@@ -183,8 +183,9 @@ export function GameProvider({ children, session }) {
 
             // Random chance to become thirsty
             const needsWater = Math.random() < 0.25;
+            const needsFertilizer = !needsWater && Math.random() < 0.20;
 
-            return { ...slot, tasks_completed_since_plant: newProgress, stage: newStage, needs_water: needsWater };
+            return { ...slot, tasks_completed_since_plant: newProgress, stage: newStage, needs_water: needsWater, needs_fertilizer: needsFertilizer };
         });
 
         setGarden(updatedGarden);
@@ -212,7 +213,7 @@ export function GameProvider({ children, session }) {
                 supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id),
                 ...updatedGarden.map(slot => {
                     if (slot.id) {
-                        const { id, user_id, planted_at, needs_water, ...updateData } = slot;
+                        const { id, user_id, planted_at, needs_water, needs_fertilizer, ...updateData } = slot;
                         return supabase.from('garden').update(updateData).eq('id', slot.id);
                     }
                     return Promise.resolve();
@@ -303,6 +304,40 @@ export function GameProvider({ children, session }) {
         }
     };
 
+    const consumeSeedsByRarity = async (targetRarity, count) => {
+        let remainingToConsume = count;
+        // deep copy inventory values to mutate
+        const updatedInv = inventory.map(item => ({ ...item }));
+
+        for (let item of updatedInv) {
+            if (item.item_type === 'seed' && item.rarity === targetRarity && remainingToConsume > 0) {
+                const consumed = Math.min(item.quantity, remainingToConsume);
+                item.quantity -= consumed;
+                remainingToConsume -= consumed;
+
+                if (!isGuest) {
+                    try {
+                        const { data: sessionData } = await supabase.auth.getSession();
+                        const uid = sessionData?.session?.user?.id;
+                        if (uid) {
+                            if (item.quantity === 0) {
+                                await supabase.from('inventory').delete().eq('user_id', uid).eq('item_name', item.item_name);
+                            } else {
+                                await supabase.from('inventory').update({ quantity: item.quantity }).eq('user_id', uid).eq('item_name', item.item_name);
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error in consumeSeedsByRarity sync:', e);
+                    }
+                }
+            }
+        }
+
+        const filteredInv = updatedInv.filter(i => i.quantity > 0);
+        setInventory(filteredInv);
+        if (isGuest) saveToLocal('inventory', filteredInv);
+    };
+
     const removePlant = async (slotIndex) => {
         const updatedGarden = garden.map(g => g.slot_index === slotIndex ? {
             ...g, stage: 'empty', seed_id: null, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
@@ -331,7 +366,7 @@ export function GameProvider({ children, session }) {
 
         const promises = updatedGarden.map(async (slot) => {
             if (slot.id) {
-                const { id, user_id, planted_at, needs_water, ...updateData } = slot;
+                const { id, user_id, planted_at, needs_water, needs_fertilizer, ...updateData } = slot;
                 const { error } = await supabase.from('garden').update(updateData).eq('id', slot.id);
                 if (error) console.error("Update Garden Error:", error);
                 return;
@@ -363,7 +398,7 @@ export function GameProvider({ children, session }) {
     };
 
     return (
-        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal, removePlant, syncGarden }}>
+        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, consumeSeedsByRarity, refetch: fetchData, setGarden, saveToLocal, removePlant, syncGarden }}>
             {children}
         </GameContext.Provider>
     );

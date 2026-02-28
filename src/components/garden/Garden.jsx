@@ -3,12 +3,12 @@ import { useGame } from '../../context/GameContext';
 import { useModal } from '../../context/ModalContext';
 import { Flower2, Beaker, Sprout, Trees } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SEED_CATALOG } from '../../data/catalog';
+import { SEED_CATALOG, getRandomSeedByRarity } from '../../data/catalog';
 import PixelSprite from '../PixelSprite';
 import { Trash2 } from 'lucide-react';
 
 export default function Garden() {
-    const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
+    const { garden, loading, inventory, updateInventory, consumeSeedsByRarity, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
     const { showAlert, showConfirm } = useModal();
     const [showFusionModal, setShowFusionModal] = useState(false);
 
@@ -24,6 +24,18 @@ export default function Garden() {
                 await syncGarden(updatedGarden);
             } else {
                 await showAlert('¡No tienes Agua Destilada! Compra en la tienda.', 'AGUA INSUFICIENTE');
+            }
+            return;
+        }
+
+        if (slot.needs_fertilizer) {
+            const fertItem = inventory.find(i => i.item_name === 'Fertilizante Premium');
+            if (fertItem && fertItem.quantity > 0) {
+                await updateInventory('Fertilizante Premium', -1, 'consumable', 'Común');
+                const updatedGarden = garden.map(g => g.slot_index === slotIndex ? { ...g, needs_fertilizer: false } : g);
+                await syncGarden(updatedGarden);
+            } else {
+                await showAlert('¡No tienes Fertilizante Premium! Compra en la tienda.', 'FERTILIZANTE INSUFICIENTE');
             }
             return;
         }
@@ -47,7 +59,8 @@ export default function Garden() {
                     seed_id: seedToPlant.item_name,
                     tasks_completed_since_plant: 0,
                     needs_water: false,
-                    is_wilted: false
+                    is_wilted: false,
+                    needs_fertilizer: false
                 };
             } else {
                 updatedGarden.push({
@@ -56,12 +69,33 @@ export default function Garden() {
                     seed_id: seedToPlant.item_name,
                     tasks_completed_since_plant: 0,
                     needs_water: false,
-                    is_wilted: false
+                    is_wilted: false,
+                    needs_fertilizer: false
                 });
             }
 
             await syncGarden(updatedGarden);
         }
+    };
+
+    const getSeedCountByRarity = (rarity) => {
+        return inventory.filter(i => i.item_type === 'seed' && i.rarity === rarity).reduce((sum, i) => sum + i.quantity, 0);
+    };
+
+    const handleFusion = async (sourceRarity, cost, targetRarity) => {
+        const count = getSeedCountByRarity(sourceRarity);
+        if (count < cost) {
+            await showAlert(`Necesitas ${cost} semillas de rareza [${sourceRarity}] para esta fusión. Tienes: ${count}`, 'MATERIAL INSUFICIENTE');
+            return;
+        }
+
+        const newSeed = getRandomSeedByRarity(targetRarity);
+
+        await consumeSeedsByRarity(sourceRarity, cost);
+        await updateInventory(newSeed.name, 1, 'seed', targetRarity);
+
+        setShowFusionModal(false);
+        await showAlert(`¡Laboratorio exitoso! Se restaron ${cost} semillas [${sourceRarity}]. HAS OBTENIDO: x1 ${newSeed.name} (${targetRarity})`, 'NUEVA SEMILLA CREADA');
     };
 
     const handleRemovePlant = async (e, slotIndex) => {
@@ -185,6 +219,15 @@ export default function Garden() {
                                 </div>
                             )}
 
+                            {/* Fertilizer icon indicator if needed */}
+                            {!isEmpty && slot.needs_fertilizer && !slot.needs_water && (
+                                <div style={{ position: 'absolute', top: 5, right: 5, cursor: 'help' }} title="¡Necesita fertilizante para crecer!">
+                                    <div className="animate-pulse-glow">
+                                        <PixelSprite templateName="fertilizerBag" baseColor="#10b981" scale={0.6} />
+                                    </div>
+                                </div>
+                            )}
+
                             {isEmpty ? (
                                 <>
                                     <div style={{ width: '40px', height: '40px', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem', border: 'var(--pixel-border-sm)', color: 'var(--text-muted)' }}>
@@ -255,17 +298,21 @@ export default function Garden() {
                                 <button onClick={() => setShowFusionModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '1.5rem' }}>&times;</button>
                             </div>
                             <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                                Fusiona semillas de menor rareza para obtener semillas superiores.
+                                Fusiona semillas de menor rareza para transmutarlas en semillas superiores aleatorias.
                             </p>
-                            <ul style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.8' }}>
-                                <li>2 Comunes = 1 Rara</li>
-                                <li>3 Raras = 1 Épica</li>
-                                <li>4 Épicas = 1 Exótica</li>
-                                <li>5 Exóticas = 1 Mercado Negro</li>
-                            </ul>
-                            <div style={{ textAlign: 'center' }}>
-                                <p>Mecánica de fusión en construcción...</p>
-                                {/* Future: Select seeds from inventory and click Fuse to subtract and give new seed */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                <button className="btn" style={{ background: '#3b82f6' }} onClick={() => handleFusion('Común', 2, 'Rara')}>
+                                    [ 2 COMUNES ] ➔ 1 RARA (Tienes {getSeedCountByRarity('Común')})
+                                </button>
+                                <button className="btn" style={{ background: '#fbbf24', color: '#000' }} onClick={() => handleFusion('Rara', 3, 'Épica')}>
+                                    [ 3 RARAS ] ➔ 1 ÉPICA (Tienes {getSeedCountByRarity('Rara')})
+                                </button>
+                                <button className="btn" style={{ background: '#ec4899', color: 'white' }} onClick={() => handleFusion('Épica', 4, 'Exótica')}>
+                                    [ 4 ÉPICAS ] ➔ 1 EXÓTICA (Tienes {getSeedCountByRarity('Épica')})
+                                </button>
+                                <button className="btn" style={{ background: '#581c87', color: 'white' }} onClick={() => handleFusion('Exótica', 5, 'Mercado Negro')}>
+                                    [ 5 EXÓTICAS ] ➔ 1 MERC. NEGRO (Tienes {getSeedCountByRarity('Exótica')})
+                                </button>
                             </div>
                         </motion.div>
                     </div>
