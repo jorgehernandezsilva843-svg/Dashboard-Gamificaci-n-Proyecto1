@@ -541,3 +541,26 @@ svg {
     gap: 1rem !important;
   }
 }
+
+/* =========================================
+   Fixed Modals Centering (Bugfix)
+   ========================================= */
+.modal-backdrop-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.modal-content-relative {
+  position: relative;
+  z-index: 1001;
+  max-width: 90vw;
+}

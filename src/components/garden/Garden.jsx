@@ -239,21 +239,12 @@ export default function Garden() {
             {/* Fusion Lab Modal Dummy */}
             <AnimatePresence>
                 {showFusionModal && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(5px)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }}>
+                    <div className="modal-backdrop-fixed">
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass-panel"
+                            className="glass-panel modal-content-relative"
                             style={{ padding: '2rem', width: '500px', maxWidth: '90%' }}
                         >
                             <div className="flex-between" style={{ marginBottom: '1.5rem' }}>

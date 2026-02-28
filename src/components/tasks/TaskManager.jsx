@@ -276,16 +276,12 @@ export default function TaskManager() {
             {/* Task Notes / Edit Modal */}
             <AnimatePresence>
                 {selectedTask && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.8)', zIndex: 1100,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
+                    <div className="modal-backdrop-fixed">
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass-panel modal-content"
+                            className="glass-panel modal-content-relative"
                             style={{ width: '90%', maxWidth: '500px', padding: '2rem', background: 'var(--bg-primary)' }}
                         >
                             <div className="flex-between" style={{ marginBottom: '1.5rem', borderBottom: 'var(--pixel-border-sm)', paddingBottom: '1rem' }}>

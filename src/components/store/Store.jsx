@@ -122,45 +122,43 @@ export default function Store() {
             {/* Gacha Result Modal */}
             <AnimatePresence>
                 {gachaResult && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        className="glass-panel"
-                        style={{
-                            position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                            zIndex: 1010, padding: '2rem', textAlign: 'center', border: `var(--pixel-border)`,
-                            boxShadow: `0 0 40px ${gachaResult.color}80, var(--shadow-retro)`,
-                            width: '90vw', maxWidth: '400px', background: 'var(--bg-secondary)'
-                        }}
-                    >
-                        <h2 style={{ color: gachaResult.color, marginBottom: '1rem', fontSize: '1.2rem', textShadow: '2px 2px #000' }}>
-                            ¡Wow!
-                        </h2>
-                        <div style={{
-                            fontSize: '4rem', margin: '2rem auto',
-                            background: '#000', width: '100px', height: '100px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            border: `var(--pixel-border-sm)`, borderRadius: '0'
-                        }}>
-                            <PixelSprite templateName="seed" baseColor={gachaResult.color} scale={1.5} />
-                        </div>
-                        <h3 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', lineHeight: '1.4' }}>
-                            {gachaResult.seedName}
-                        </h3>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.75rem' }}>
-                            Rareza: <strong style={{ color: gachaResult.color }}>{gachaResult.rarity}</strong>
-                        </p>
-                        <button className="btn" style={{ background: gachaResult.color }} onClick={() => setGachaResult(null)}>
-                            EQUIPAR
-                        </button>
-                    </motion.div>
+                    <div className="modal-backdrop-fixed" onClick={() => setGachaResult(null)}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="glass-panel modal-content-relative"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                padding: '2rem', textAlign: 'center', border: `var(--pixel-border)`,
+                                boxShadow: `0 0 40px ${gachaResult.color}80, var(--shadow-retro)`,
+                                width: '90vw', maxWidth: '400px', background: 'var(--bg-secondary)'
+                            }}
+                        >
+                            <h2 style={{ color: gachaResult.color, marginBottom: '1rem', fontSize: '1.2rem', textShadow: '2px 2px #000' }}>
+                                ¡Wow!
+                            </h2>
+                            <div style={{
+                                fontSize: '4rem', margin: '2rem auto',
+                                background: '#000', width: '100px', height: '100px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                border: `var(--pixel-border-sm)`, borderRadius: '0'
+                            }}>
+                                <PixelSprite templateName="seed" baseColor={gachaResult.color} scale={1.5} />
+                            </div>
+                            <h3 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                                {gachaResult.seedName}
+                            </h3>
+                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.75rem' }}>
+                                Rareza: <strong style={{ color: gachaResult.color }}>{gachaResult.rarity}</strong>
+                            </p>
+                            <button className="btn" style={{ background: gachaResult.color }} onClick={() => setGachaResult(null)}>
+                                EQUIPAR
+                            </button>
+                        </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
-            {/* Background Overlay */}
-            {gachaResult && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000 }} onClick={() => setGachaResult(null)} />
-            )}
         </div>
     );
 }
