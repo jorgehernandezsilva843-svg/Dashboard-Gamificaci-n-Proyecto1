@@ -6,6 +6,7 @@ export default function Auth() {
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const [isLogin, setIsLogin] = useState(true);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState(null);
@@ -27,6 +28,11 @@ export default function Auth() {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        data: {
+                            username: username || email.split('@')[0],
+                        }
+                    }
                 });
                 if (error) throw error;
                 setMessage('Registrado! Ahora puedes iniciar sesión.');
@@ -37,20 +43,6 @@ export default function Auth() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleGuestLogin = () => {
-        const fakeSession = {
-            access_token: 'fake', refresh_token: 'fake', expires_in: 3600, expires_at: 0, token_type: 'bearer',
-            user: { id: 'guest-user', email: 'guest@questbloom.com' }
-        };
-        // We simulate a supabase response format for the App.jsx to pick up
-        // Note: App relies on getting the session via state, but normally we check supabase.auth.getSession.
-        // For the mock, we can broadcast an auth stage change or manipulate localStorage
-        // A cleaner way for our prototype is to just trigger a window event that App.jsx listens to, 
-        // or just set a localStorage item to tell App.jsx to fake the session.
-        localStorage.setItem('questbloom_guest', 'true');
-        window.location.href = '/dashboard';
     };
 
     return (
@@ -91,6 +83,19 @@ export default function Auth() {
                     </div>
 
                     <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {!isLogin && (
+                            <div className="input-group" style={{ marginBottom: 0 }}>
+                                <input
+                                    className="input-field"
+                                    type="text"
+                                    placeholder="PLAYER NAME"
+                                    value={username}
+                                    required={!isLogin}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    maxLength={20}
+                                />
+                            </div>
+                        )}
                         <div className="input-group" style={{ marginBottom: 0 }}>
                             <input
                                 className="input-field"
@@ -124,13 +129,6 @@ export default function Auth() {
                             {loading ? 'WAIT...' : (isLogin ? 'START GAME' : 'NEW SAVE')}
                         </button>
                     </form>
-
-                    <button
-                        onClick={handleGuestLogin}
-                        className="btn btn-secondary"
-                    >
-                        [ GUEST DEMO ]
-                    </button>
 
                     <div style={{ textAlign: 'center', marginTop: '1rem' }}>
                         <button
