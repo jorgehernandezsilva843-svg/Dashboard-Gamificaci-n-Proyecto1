@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useModal } from '../../context/ModalContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { supabase } from '../../lib/supabase';
@@ -9,12 +10,13 @@ import PixelSprite from '../PixelSprite';
 
 export default function Store() {
     const { profile, loading, updateProfile, updateInventory } = useGame();
+    const { showAlert } = useModal();
     const [purchasing, setPurchasing] = useState(false);
     const [gachaResult, setGachaResult] = useState(null);
 
     const triggerGacha = async () => {
         if (profile.coins < 100) {
-            alert("No tienes suficientes monedas!");
+            await showAlert("¡No tienes suficientes monedas!", "FONDOS INSUFICIENTES");
             return;
         }
 
@@ -49,12 +51,12 @@ export default function Store() {
 
     const buyConsumable = async (price, name) => {
         if (profile.coins < price) {
-            alert("No tienes suficientes monedas!");
+            await showAlert("¡No tienes suficientes monedas!", "FONDOS INSUFICIENTES");
             return;
         }
         updateProfile({ coins: profile.coins - price });
         updateInventory(name, 1, 'consumable', 'Común');
-        alert(`Compraste: ${name}`);
+        await showAlert(`Has comprado x1 ${name}.`, "COMPRA EXITOSA");
     };
 
     return (

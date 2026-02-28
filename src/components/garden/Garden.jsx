@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
+import { useModal } from '../../context/ModalContext';
 import { Flower2, Beaker, Sprout, Trees } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEED_CATALOG } from '../../data/catalog';
@@ -8,6 +9,7 @@ import { Trash2 } from 'lucide-react';
 
 export default function Garden() {
     const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
+    const { showAlert, showConfirm } = useModal();
     const [showFusionModal, setShowFusionModal] = useState(false);
 
     const handleSlotClick = async (slotIndex) => {
@@ -21,7 +23,7 @@ export default function Garden() {
                 const updatedGarden = garden.map(g => g.slot_index === slotIndex ? { ...g, needs_water: false } : g);
                 await syncGarden(updatedGarden);
             } else {
-                alert('¡No tienes Agua Destilada! Compra en la tienda.');
+                await showAlert('¡No tienes Agua Destilada! Compra en la tienda.', 'AGUA INSUFICIENTE');
             }
             return;
         }
@@ -29,7 +31,7 @@ export default function Garden() {
         if (slot.stage === 'empty') {
             const seeds = inventory.filter(i => i.item_type === 'seed');
             if (seeds.length === 0) {
-                alert('¡No tienes semillas! Consigue una en la tienda.');
+                await showAlert('¡No tienes semillas! Consigue una en la tienda.', 'SIN SEMILLAS');
                 return;
             }
             const seedToPlant = seeds[0];
@@ -64,7 +66,8 @@ export default function Garden() {
 
     const handleRemovePlant = async (e, slotIndex) => {
         e.stopPropagation();
-        if (window.confirm('¿Estás seguro de arrancar esta planta? Se perderá para siempre y no podrás recuperarla.')) {
+        const conf = await showConfirm('¿Estás seguro de arrancar esta planta? Se perderá para siempre y no podrás recuperarla.', 'ARRANCAR PLANTA');
+        if (conf) {
             await removePlant(slotIndex);
         }
     };

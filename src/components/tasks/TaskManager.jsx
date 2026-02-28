@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
-import { Plus, CheckCircle, Circle, Skull, Zap, FileText, Trash2, X } from 'lucide-react';
+import { useModal } from '../../context/ModalContext';
+import { Plus, CheckCircle, Circle, Skull, Zap, FileText, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PixelSprite from '../PixelSprite';
 
 export default function TaskManager() {
     const { tasks, addTask, completeTask, updateTask, deleteTask } = useGame();
+    const { showConfirm } = useModal();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [subtasksCount, setSubtasksCount] = useState(0);
@@ -26,8 +28,9 @@ export default function TaskManager() {
         }
     };
 
-    const handleDelete = (id) => {
-        if (window.confirm("¿Seguro que quieres eliminar este monstruo definitivamente?")) {
+    const handleDelete = async (id) => {
+        const confirmed = await showConfirm("¿Seguro que quieres eliminar este monstruo definitivamente?", "ELIMINAR TAREA");
+        if (confirmed) {
             deleteTask(id);
             setSelectedTask(null);
         }
@@ -317,7 +320,7 @@ export default function TaskManager() {
 
                             <div className="flex-between" style={{ marginTop: '2rem' }}>
                                 <button className="btn" style={{ background: 'var(--danger)', color: 'white' }} onClick={() => handleDelete(selectedTask.id)}>
-                                    <Trash2 size={16} /> [ BORRAR ]
+                                    [ BORRAR ]
                                 </button>
                                 <button className="btn btn-primary" onClick={handleSaveNote}>
                                     [ GUARDAR ]

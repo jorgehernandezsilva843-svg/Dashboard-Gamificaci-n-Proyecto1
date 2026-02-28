@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Square, Music, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../context/GameContext';
+import { useModal } from '../context/ModalContext';
 import { supabase } from '../lib/supabase';
 import PixelSprite from './PixelSprite';
 
@@ -11,6 +12,7 @@ const BREAK_MINUTES = 5;
 
 export default function PomodoroTimer() {
     const { profile, updateProfile, isGuest } = useGame();
+    const { showAlert, showConfirm } = useModal();
 
     const [mode, setMode] = useState('work'); // 'work' or 'break'
     const [timeLeft, setTimeLeft] = useState(WORK_MINUTES * 60);
@@ -51,26 +53,26 @@ export default function PomodoroTimer() {
         return () => clearInterval(timerRef.current);
     }, [isActive, timeLeft]);
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
         clearInterval(timerRef.current);
         if (mode === 'work') {
             setMode('break');
             setTimeLeft(BREAK_MINUTES * 60);
-            alert("¡Trabajo de concentración terminado! Las plantas han crecido aceleradamente. Es hora de un descanso de 5 minutos.");
+            await showAlert("¡Trabajo de concentración terminado! Las plantas han crecido aceleradamente. Es hora de un descanso de 5 minutos.", "FOCO COMPLETADO");
         } else {
             setMode('work');
             setTimeLeft(WORK_MINUTES * 60);
             setIsActive(false);
             audioRef.current?.pause();
-            alert("¡Descanso terminado! Listo para otra sesión cuando quieras.");
+            await showAlert("¡Descanso terminado! Listo para otra sesión cuando quieras.", "DESCANSO COMPLETADO");
         }
     };
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
         if (isActive) {
             // Penalización por cancelar antes de tiempo
             if (mode === 'work' && timeLeft < WORK_MINUTES * 60) {
-                const confirmCancel = window.confirm("¿Seguro que quieres cancelar? Perderás 5 monedas como penalización y el monstruo atacará.");
+                const confirmCancel = await showConfirm("¿Seguro que quieres cancelar? Perderás 5 monedas como penalización y el monstruo atacará.", "CANCELAR FOCO");
                 if (!confirmCancel) return;
 
                 // Aplicar penalización
@@ -93,7 +95,7 @@ export default function PomodoroTimer() {
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
-        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')} `;
     };
 
     return (
@@ -162,7 +164,7 @@ export default function PomodoroTimer() {
 
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className={`glass-panel ${isActive && mode === 'work' ? 'animate-pulse-glow' : ''}`}
+                className={`glass - panel ${isActive && mode === 'work' ? 'animate-pulse-glow' : ''} `}
                 style={{
                     width: '60px',
                     height: '60px',
