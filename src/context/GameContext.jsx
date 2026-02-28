@@ -256,8 +256,26 @@ export function GameProvider({ children, session }) {
         }
     };
 
+    const removePlant = async (slotIndex) => {
+        const updatedGarden = garden.map(g => g.slot_index === slotIndex ? {
+            ...g, stage: 'empty', seed_id: null, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
+        } : g);
+        setGarden(updatedGarden);
+
+        if (isGuest) {
+            saveToLocal('garden', updatedGarden);
+        } else {
+            const slot = updatedGarden.find(g => g.slot_index === slotIndex);
+            if (slot && slot.id) {
+                await supabase.from('garden').update({
+                    stage: 'empty', seed_id: null, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
+                }).eq('id', slot.id);
+            }
+        }
+    };
+
     return (
-        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal }}>
+        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal, removePlant }}>
             {children}
         </GameContext.Provider>
     );

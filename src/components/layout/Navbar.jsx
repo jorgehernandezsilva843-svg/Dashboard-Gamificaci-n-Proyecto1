@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
-import PixelSprite from '../PixelSprite';
+import GameIcon from '../GameIcon';
 
 export default function Navbar() {
     const location = useLocation();
@@ -97,22 +97,22 @@ export default function Navbar() {
                 pointerEvents: 'none'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-tertiary)' }}>
-                    <PixelSprite templateName="coin" baseColor="#fbbf24" scale={0.4} />
+                    <GameIcon type="coin" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{profile?.coins || 0}</span>
                 </div>
                 <div style={{ width: '2px', background: '#000' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--water)' }}>
-                    <PixelSprite templateName="waterDrop" baseColor="#3b82f6" scale={0.4} />
+                    <GameIcon type="water" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{inventory.find(i => i.item_name === 'Agua Destilada')?.quantity || 0}</span>
                 </div>
                 <div style={{ width: '2px', background: '#000' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--success)' }}>
-                    <PixelSprite templateName="fertilizerBag" baseColor="#10b981" scale={0.4} />
+                    <GameIcon type="fertilizer" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{inventory.find(i => i.item_name === 'Fertilizante Premium')?.quantity || 0}</span>
                 </div>
                 <div style={{ width: '2px', background: '#000' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-secondary)' }}>
-                    <PixelSprite templateName="seed" baseColor="#a78bfa" scale={0.4} />
+                    <GameIcon type="seed" scale={0.4} />
                     <span style={{ fontSize: '0.8rem' }}>{inventory.filter(i => i.item_type === 'seed').reduce((acc, curr) => acc + curr.quantity, 0)}</span>
                 </div>
             </div>

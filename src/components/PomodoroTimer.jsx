@@ -124,16 +124,19 @@ export default function PomodoroTimer() {
                                 {mode === 'work' ? 'ESTUDIO INTENSO (2x Crecimiento)' : 'DESCANSO ZEN'}
                             </div>
                             <div style={{
-                                fontSize: '3.5rem',
+                                fontSize: '2.5rem',
                                 fontWeight: 'bold',
                                 color: mode === 'work' ? '#ff0000' : '#00ff00',
                                 textShadow: mode === 'work' ? '0 0 10px #ff0000' : '0 0 10px #00ff00',
                                 background: '#111',
                                 border: 'var(--pixel-border-sm)',
-                                padding: '1rem 0',
+                                padding: '1rem',
                                 fontFamily: '"Press Start 2P", monospace',
-                                display: 'inline-block',
-                                width: '100%'
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '100%',
+                                boxSizing: 'border-box'
                             }}>
                                 {formatTime(timeLeft)}
                             </div>

@@ -125,10 +125,11 @@ export default function TaskManager() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '1rem',
-                                    background: 'var(--bg-tertiary)',
-                                    border: 'var(--pixel-border-sm)',
+                                    background: '#0f172a', // Deep navy blue
+                                    border: '4px solid #1e293b',
                                     borderLeft: task.is_project ? '8px solid var(--danger)' : '8px solid var(--accent-primary)',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5), 4px 4px 0px 0px rgba(0, 0, 0, 0.5)'
                                 }}
                             >
                                 <button
@@ -202,8 +203,11 @@ export default function TaskManager() {
                 <div className="pixel-corners" style={{
                     flex: 1, maxHeight: '500px', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center', position: 'relative',
-                    overflow: 'hidden', background: '#000', border: 'var(--pixel-border)',
-                    backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0V0zm20 20h20v20H20V20z\' fill=\'%230f172a\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")'
+                    overflow: 'hidden', background: '#020617', border: '6px double #334155',
+                    boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8), 6px 6px 0px 0px rgba(0, 0, 0, 0.5)',
+                    backgroundImage: 'repeating-linear-gradient(45deg, #0f172a 25%, transparent 25%, transparent 75%, #0f172a 75%, #0f172a), repeating-linear-gradient(45deg, #0f172a 25%, #020617 25%, #020617 75%, #0f172a 75%, #0f172a)',
+                    backgroundPosition: '0 0, 10px 10px',
+                    backgroundSize: '20px 20px'
                 }}>
 
                     <AnimatePresence>

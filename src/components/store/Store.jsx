@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
-import { Package, Droplets, Sparkles, Gem } from 'lucide-react';
+import { Package, Droplets, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { supabase } from '../../lib/supabase';
 import { getRandomSeed } from '../../data/catalog';
+import GameIcon from '../GameIcon';
+import PixelSprite from '../PixelSprite';
 
 export default function Store() {
     const { profile, loading, updateProfile, updateInventory } = useGame();
@@ -64,7 +66,7 @@ export default function Store() {
                     <p style={{ color: 'var(--text-secondary)' }}>Tienda de suministros.</p>
                 </div>
                 <div className="glass-panel" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#000' }}>
-                    <span style={{ color: 'var(--accent-tertiary)' }}>🪙</span>
+                    <GameIcon type="coin" scale={0.4} />
                     <strong>{profile?.coins || 0}</strong>
                 </div>
             </div>
@@ -80,8 +82,8 @@ export default function Store() {
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
                         Mantiene vivas tus plantas. Necesaria para que el temporizador de focus no se detenga.
                     </p>
-                    <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => buyConsumable(10, 'Agua Destilada')}>
-                        Comprar (10 <Gem size={14} />)
+                    <button className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} onClick={() => buyConsumable(10, 'Agua Destilada')}>
+                        Comprar (10 <GameIcon type="coin" scale={0.3} />)
                     </button>
                 </div>
 
@@ -94,8 +96,8 @@ export default function Store() {
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
                         Acelera el tiempo de crecimiento de un slot en 1 etapa.
                     </p>
-                    <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => buyConsumable(50, 'Fertilizante Premium')}>
-                        Comprar (50 <Gem size={14} />)
+                    <button className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} onClick={() => buyConsumable(50, 'Fertilizante Premium')}>
+                        Comprar (50 <GameIcon type="coin" scale={0.3} />)
                     </button>
                 </div>
 
@@ -110,8 +112,8 @@ export default function Store() {
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
                             Contiene una semilla aleatoria. ¡Incluso podría soltar una del Mercado Negro (0.1%)!
                         </p>
-                        <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} onClick={triggerGacha} disabled={purchasing}>
-                            {purchasing ? 'Abriendo...' : 'Abrir Gacha (100 \uD83D\uDC8E)'}
+                        <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem', display: 'flex', alignItems: 'center', justifyItems: 'center', gap: '0.5rem' }} onClick={triggerGacha} disabled={purchasing}>
+                            {purchasing ? 'Abriendo...' : <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}>Abrir Gacha (100 <GameIcon type="coin" scale={0.3} />)</span>}
                         </button>
                     </div>
                 </div>
@@ -142,7 +144,7 @@ export default function Store() {
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             border: `var(--pixel-border-sm)`, borderRadius: '0'
                         }}>
-                            🌱
+                            <PixelSprite templateName="seed" baseColor={gachaResult.color} scale={1.5} />
                         </div>
                         <h3 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', lineHeight: '1.4' }}>
                             {gachaResult.seedName}

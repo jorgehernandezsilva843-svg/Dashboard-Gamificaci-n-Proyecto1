@@ -4,9 +4,10 @@ import { Flower2, Beaker, Sprout, Trees } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SEED_CATALOG } from '../../data/catalog';
 import PixelSprite from '../PixelSprite';
+import { Trash2 } from 'lucide-react';
 
 export default function Garden() {
-    const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest } = useGame();
+    const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest, removePlant } = useGame();
     const [showFusionModal, setShowFusionModal] = useState(false);
 
     const handleSlotClick = (slotIndex) => {
@@ -40,6 +41,13 @@ export default function Garden() {
             } : g);
             setGarden(updatedGarden);
             if (isGuest) saveToLocal('garden', updatedGarden);
+        }
+    };
+
+    const handleRemovePlant = (e, slotIndex) => {
+        e.stopPropagation();
+        if (window.confirm('¿Estás seguro de arrancar esta planta? Se perderá para siempre y no podrás recuperarla.')) {
+            removePlant(slotIndex);
         }
     };
 
@@ -186,6 +194,29 @@ export default function Garden() {
                                     <div style={{ width: '80%', background: '#000', height: '6px', marginTop: '0.5rem', border: '1px solid #333' }}>
                                         <div style={{ width: `${Math.min(100, (slot.tasks_completed_since_plant / 10) * 100)}%`, height: '100%', background: 'var(--accent-secondary)' }} />
                                     </div>
+
+                                    <button
+                                        onClick={(e) => handleRemovePlant(e, i)}
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: 5,
+                                            right: 5,
+                                            background: '#ef4444', // Red
+                                            border: 'var(--pixel-border-sm)',
+                                            color: '#fff',
+                                            width: '24px',
+                                            height: '24px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            zIndex: 5
+                                        }}
+                                        title="Arrancar planta"
+                                    >
+                                        <Trash2 size={12} />
+                                    </button>
                                 </>
                             )}
                         </motion.div>
