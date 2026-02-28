@@ -62,10 +62,10 @@ export default function TaskManager() {
     };
 
     return (
-        <div style={{ padding: '2rem', marginLeft: '250px', display: 'flex', gap: '2rem' }}>
+        <div className="main-content bestiary-layout" style={{ display: 'flex', gap: '2rem' }}>
 
             {/* Left Column: Tasks List */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '600px' }}>
+            <div className="bestiary-left-col" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '600px' }}>
                 <h1 className="text-gradient" style={{ textShadow: '2px 2px #000' }}>Bestiary</h1>
                 <p style={{ color: 'var(--text-secondary)', marginTop: '-1rem' }}>Slay tasks to gain XP, Coins, and Items.</p>
 
@@ -198,10 +198,10 @@ export default function TaskManager() {
             </div>
 
             {/* Right Column: Active Combat Arena */}
-            <div style={{ width: '400px', display: 'flex', flexDirection: 'column' }}>
+            <div className="combat-arena" style={{ width: '400px', display: 'flex', flexDirection: 'column' }}>
                 <h2 className="text-gradient" style={{ marginBottom: '1.5rem', textShadow: '2px 2px #000' }}>Combat Arena</h2>
                 <div className="pixel-corners" style={{
-                    flex: 1, maxHeight: '500px', display: 'flex', flexDirection: 'column',
+                    flex: 1, maxHeight: '500px', minHeight: '300px', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center', position: 'relative',
                     overflow: 'hidden', background: '#020617', border: '6px double #334155',
                     boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8), 6px 6px 0px 0px rgba(0, 0, 0, 0.5)',
@@ -283,7 +283,7 @@ export default function TaskManager() {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="glass-panel"
+                            className="glass-panel modal-content"
                             style={{ width: '90%', maxWidth: '500px', padding: '2rem', background: 'var(--bg-primary)' }}
                         >
                             <div className="flex-between" style={{ marginBottom: '1.5rem', borderBottom: 'var(--pixel-border-sm)', paddingBottom: '1rem' }}>

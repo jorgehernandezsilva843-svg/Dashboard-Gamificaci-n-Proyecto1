@@ -26,7 +26,7 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="glass-panel" style={{
+        <nav className="glass-panel nav-sidebar" style={{
             position: 'fixed',
             top: 0,
             left: 0,
@@ -39,17 +39,18 @@ export default function Navbar() {
             borderRadius: '0 var(--radius-lg) var(--radius-lg) 0',
             borderLeft: 'none'
         }}>
-            <div style={{ marginBottom: '3rem', padding: '0.5rem', width: 'auto' }}>
+            <div className="nav-header" style={{ marginBottom: '3rem', padding: '0.5rem', width: 'auto' }}>
                 <h2 className="text-gradient" style={{ fontSize: '1.2rem' }}>QuestBloom</h2>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+            <div className="nav-links" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
                 {navItems.map((item) => {
                     const isActive = location.pathname.includes(item.path);
                     return (
                         <Link
                             key={item.name}
                             to={item.path}
+                            className="nav-item"
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -66,7 +67,7 @@ export default function Navbar() {
                             <div style={{ color: isActive ? 'var(--accent-secondary)' : 'var(--text-muted)' }}>
                                 {item.icon}
                             </div>
-                            {item.name}
+                            <span className="nav-item-text">{item.name}</span>
                         </Link>
                     );
                 })}
@@ -77,9 +78,10 @@ export default function Navbar() {
                 so it's always visible, or we could make it a fixed floating panel. Let's make it a fixed floating panel 
                 top right over the main content area for better visibility.
             */}
+            {/* Inventory HUD */}
             <button
                 onClick={handleLogout}
-                className="btn btn-secondary"
+                className="btn btn-secondary nav-logout"
                 style={{ width: '100%', justifyContent: 'flex-start', border: 'none', background: 'transparent', borderTop: 'var(--pixel-border)' }}
             >
                 <LogOut size={16} />
@@ -87,7 +89,7 @@ export default function Navbar() {
             </button>
 
             {/* Floating Top-Right HUD */}
-            <div className="glass-panel" style={{
+            <div className="glass-panel floating-hud" style={{
                 position: 'fixed',
                 top: '1rem', right: '1rem',
                 display: 'flex', gap: '1rem',

@@ -58,7 +58,7 @@ export default function Store() {
     };
 
     return (
-        <div style={{ padding: '2rem', marginLeft: '250px' }}>
+        <div className="main-content">
             <div className="flex-between" style={{ marginBottom: '2rem' }}>
                 <div>
                     <h1 className="text-gradient">El Refugio</h1>

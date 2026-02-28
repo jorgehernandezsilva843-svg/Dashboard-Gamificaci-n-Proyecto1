@@ -59,6 +59,18 @@ export function GameProvider({ children, session }) {
         setLoading(false);
     };
 
+    // Polyfill to safely generate UUIDs on mobile HTTP connections (non-secure context)
+    const generateUUID = () => {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        // Fallback for non-HTTPS local IP testing
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+
     // Función de Sincronización Principal (Real-Time emulation via Promise.all)
     const fetchData = async () => {
         setLoading(true);
@@ -103,7 +115,7 @@ export function GameProvider({ children, session }) {
             hp = 100;
         }
 
-        const taskId = isGuest ? 'mock-' + Date.now() : crypto.randomUUID();
+        const taskId = isGuest ? 'mock-' + Date.now() : generateUUID();
 
         const newTask = {
             id: taskId,
@@ -140,7 +152,7 @@ export function GameProvider({ children, session }) {
                 hp: hp,
                 status: 'pending'
             };
-            supabase.from('tasks').insert(dbNewTask).then();
+            await supabase.from('tasks').insert(dbNewTask);
         }
     };
 
@@ -194,13 +206,12 @@ export function GameProvider({ children, session }) {
             saveToLocal('garden', updatedGarden);
         } else {
             // [Optimistic UI]: Primero se actualizan los arreglos locales en memoria de React,
-            // y luego se despachan las instrucciones a Supabase asíncronamente (.then()) sin usar 'await',
-            // lo que evita congelar la UI si hay latencia de red.
-            supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId).then();
-            supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id).then();
-            updatedGarden.forEach(slot => {
-                if (slot.id) supabase.from('garden').update(slot).eq('id', slot.id).then();
-            });
+            // y luego se esperan las instrucciones a Supabase para mayor fiabilidad.
+            await Promise.all([
+                supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId),
+                supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id),
+                ...updatedGarden.map(slot => slot.id ? supabase.from('garden').update(slot).eq('id', slot.id) : Promise.resolve())
+            ]);
         }
 
         // Handle drops (Gacha box drop chances for seeds etc)
@@ -215,7 +226,7 @@ export function GameProvider({ children, session }) {
         if (isGuest) {
             saveToLocal('tasks', updatedTasks);
         } else {
-            supabase.from('tasks').update(updates).eq('id', taskId).then();
+            await supabase.from('tasks').update(updates).eq('id', taskId);
         }
     };
 
@@ -225,7 +236,7 @@ export function GameProvider({ children, session }) {
         if (isGuest) {
             saveToLocal('tasks', updatedTasks);
         } else {
-            supabase.from('tasks').delete().eq('id', taskId).then();
+            await supabase.from('tasks').delete().eq('id', taskId);
         }
     };
 
@@ -295,8 +306,19 @@ export function GameProvider({ children, session }) {
         }
     };
 
+    const syncGarden = async (updatedGarden) => {
+        setGarden(updatedGarden);
+        if (isGuest) {
+            saveToLocal('garden', updatedGarden);
+        } else {
+            await Promise.all(
+                updatedGarden.map(slot => slot.id ? supabase.from('garden').update(slot).eq('id', slot.id) : Promise.resolve())
+            );
+        }
+    };
+
     return (
-        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal, removePlant }}>
+        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal, removePlant, syncGarden }}>
             {children}
         </GameContext.Provider>
     );

@@ -4,7 +4,7 @@ export default function Dashboard({ session }) {
     const { profile } = useGame();
 
     return (
-        <div style={{ padding: '2rem', marginLeft: '250px' }}>
+        <div className="main-content">
             <h1>Dashboard</h1>
             <p style={{ color: 'var(--text-secondary)' }}>
                 Welcome back, <span className="text-gradient" style={{ fontWeight: 'bold' }}>{profile?.username || session?.user?.email}</span>

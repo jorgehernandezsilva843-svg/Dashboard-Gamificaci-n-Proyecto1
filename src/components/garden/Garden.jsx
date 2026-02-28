@@ -7,7 +7,7 @@ import PixelSprite from '../PixelSprite';
 import { Trash2 } from 'lucide-react';
 
 export default function Garden() {
-    const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest, removePlant } = useGame();
+    const { garden, loading, inventory, updateInventory, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
     const [showFusionModal, setShowFusionModal] = useState(false);
 
     const handleSlotClick = (slotIndex) => {
@@ -19,8 +19,7 @@ export default function Garden() {
             if (waterItem && waterItem.quantity > 0) {
                 updateInventory('Agua Destilada', -1, 'consumable', 'Común');
                 const updatedGarden = garden.map(g => g.slot_index === slotIndex ? { ...g, needs_water: false } : g);
-                setGarden(updatedGarden);
-                if (isGuest) saveToLocal('garden', updatedGarden);
+                syncGarden(updatedGarden);
             } else {
                 alert('¡No tienes Agua Destilada! Compra en la tienda.');
             }
@@ -39,8 +38,7 @@ export default function Garden() {
             const updatedGarden = garden.map(g => g.slot_index === slotIndex ? {
                 ...g, stage: 'seed', seed_id: seedToPlant.item_name, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
             } : g);
-            setGarden(updatedGarden);
-            if (isGuest) saveToLocal('garden', updatedGarden);
+            syncGarden(updatedGarden);
         }
     };
 
@@ -105,7 +103,7 @@ export default function Garden() {
     }
 
     return (
-        <div style={{ padding: '2rem', marginLeft: '250px' }}>
+        <div className="main-content">
             <div className="flex-between" style={{ marginBottom: '2rem' }}>
                 <div>
                     <h1 className="text-gradient">Zen Garden</h1>
@@ -116,13 +114,7 @@ export default function Garden() {
                 </button>
             </div>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)', // Fixed 5x2 grid for true retro feel
-                gap: '1rem',
-                maxWidth: '1000px',
-                margin: '0 auto'
-            }}>
+            <div className="garden-grid">
                 {/* We map exactly 10 slots */}
                 {[...Array(10)].map((_, i) => {
                     const slot = garden.find(g => g.slot_index === i);
