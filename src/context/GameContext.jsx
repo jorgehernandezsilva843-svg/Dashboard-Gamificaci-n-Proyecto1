@@ -212,7 +212,7 @@ export function GameProvider({ children, session }) {
                 supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id),
                 ...updatedGarden.map(slot => {
                     if (slot.id) {
-                        const { id, user_id, planted_at, ...updateData } = slot;
+                        const { id, user_id, planted_at, needs_water, ...updateData } = slot;
                         return supabase.from('garden').update(updateData).eq('id', slot.id);
                     }
                     return Promise.resolve();
@@ -283,17 +283,22 @@ export function GameProvider({ children, session }) {
         if (isGuest) {
             saveToLocal('inventory', updatedInv);
         } else {
-            // For true Supabase implementation we'd do an upsert
-            // Oversimplified for logic here:
-            if (!exists) {
-                await supabase.from('inventory').insert({ user_id: profile.id, item_name: itemName, quantity: quantityChange, item_type: itemType, rarity });
-            } else {
-                const target = updatedInv.find(i => i.item_name === itemName);
-                if (target) {
-                    await supabase.from('inventory').update({ quantity: target.quantity }).eq('user_id', profile.id).eq('item_name', itemName);
+            try {
+                if (!exists) {
+                    const { error } = await supabase.from('inventory').insert({ user_id: session.user.id, item_name: itemName, quantity: quantityChange, item_type: itemType, rarity });
+                    if (error) console.error("Inventory Insert Error:", error);
                 } else {
-                    await supabase.from('inventory').delete().eq('user_id', profile.id).eq('item_name', itemName);
+                    const target = updatedInv.find(i => i.item_name === itemName);
+                    if (target) {
+                        const { error } = await supabase.from('inventory').update({ quantity: target.quantity }).eq('user_id', session.user.id).eq('item_name', itemName);
+                        if (error) console.error("Inventory Update Error:", error);
+                    } else {
+                        const { error } = await supabase.from('inventory').delete().eq('user_id', session.user.id).eq('item_name', itemName);
+                        if (error) console.error("Inventory Delete Error:", error);
+                    }
                 }
+            } catch (err) {
+                console.error("Inventory Exception:", err);
             }
         }
     };
@@ -310,7 +315,7 @@ export function GameProvider({ children, session }) {
             const slot = updatedGarden.find(g => g.slot_index === slotIndex);
             if (slot && slot.id) {
                 await supabase.from('garden').update({
-                    stage: 'empty', seed_id: null, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
+                    stage: 'empty', seed_id: null, tasks_completed_since_plant: 0, is_wilted: false
                 }).eq('id', slot.id);
             }
         }
@@ -326,7 +331,7 @@ export function GameProvider({ children, session }) {
 
         const promises = updatedGarden.map(async (slot) => {
             if (slot.id) {
-                const { id, user_id, planted_at, ...updateData } = slot;
+                const { id, user_id, planted_at, needs_water, ...updateData } = slot;
                 const { error } = await supabase.from('garden').update(updateData).eq('id', slot.id);
                 if (error) console.error("Update Garden Error:", error);
                 return;
@@ -340,7 +345,6 @@ export function GameProvider({ children, session }) {
                     stage: slot.stage,
                     seed_id: slot.seed_id,
                     tasks_completed_since_plant: slot.tasks_completed_since_plant,
-                    needs_water: slot.needs_water,
                     is_wilted: slot.is_wilted
                 };
 
