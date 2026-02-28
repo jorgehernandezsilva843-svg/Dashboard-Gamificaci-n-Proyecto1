@@ -428,6 +428,17 @@ svg {
   margin: 0 auto;
 }
 
+.pomodoro-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0 !important;
@@ -514,5 +525,19 @@ svg {
   .modal-content {
     width: 95% !important;
     padding: 1.5rem 1rem !important;
+  }
+
+  /* Pomodoro Timer Override */
+  .pomodoro-container {
+    bottom: 90px !important;
+    /* Above the mobile bottom nav */
+    right: 1rem !important;
+  }
+
+  /* Bestiary Invoke Task Group */
+  .invoke-btn-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
   }
 }

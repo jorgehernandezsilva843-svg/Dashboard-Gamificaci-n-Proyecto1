@@ -3,6 +3,7 @@ import { Play, Pause, Square, Music, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import { supabase } from '../lib/supabase';
+import PixelSprite from './PixelSprite';
 
 // Constantes Pomodoro
 const WORK_MINUTES = 30;
@@ -96,16 +97,7 @@ export default function PomodoroTimer() {
     };
 
     return (
-        <div style={{
-            position: 'fixed',
-            bottom: '2rem',
-            right: '2rem',
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: '1rem'
-        }}>
+        <div className="pomodoro-container">
             <AnimatePresence>
                 {isExpanded && (
                     <motion.div
@@ -185,7 +177,7 @@ export default function PomodoroTimer() {
                     boxShadow: 'var(--shadow-retro)'
                 }}
             >
-                <Music size={24} />
+                <PixelSprite templateName="music" baseColor={isActive ? (mode === 'work' ? '#000' : '#fff') : 'var(--text-primary)'} scale={1.5} />
             </button>
         </div>
     );
