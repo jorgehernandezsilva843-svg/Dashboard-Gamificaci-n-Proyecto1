@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
-import { Package, Droplets, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { supabase } from '../../lib/supabase';
@@ -75,8 +74,8 @@ export default function Store() {
 
                 {/* Distilled Water */}
                 <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
-                        <Droplets size={30} />
+                    <div style={{ width: '60px', height: '60px', background: 'rgba(59, 130, 246, 0.2)', border: 'var(--pixel-border-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                        <PixelSprite templateName="waterDrop" baseColor="#3b82f6" scale={1.2} />
                     </div>
                     <h3>Agua Destilada</h3>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
@@ -89,8 +88,8 @@ export default function Store() {
 
                 {/* Premium Fertilizer */}
                 <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
-                        <Sparkles size={30} />
+                    <div style={{ width: '60px', height: '60px', background: 'rgba(16, 185, 129, 0.2)', border: 'var(--pixel-border-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                        <PixelSprite templateName="fertilizerBag" baseColor="#10b981" scale={1.2} />
                     </div>
                     <h3>Fertilizante Premium</h3>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
@@ -105,8 +104,8 @@ export default function Store() {
                 <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', border: '1px solid var(--accent-primary)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div className="animate-pulse-glow" style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', zIndex: 0 }} />
                     <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--accent-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', boxShadow: '0 0 20px var(--accent-glow)' }}>
-                            <Package size={40} />
+                        <div style={{ width: '80px', height: '80px', background: 'var(--accent-primary)', border: 'var(--pixel-border-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', boxShadow: '0 0 20px var(--accent-glow)' }}>
+                            <PixelSprite templateName="chest" baseColor="#ffffff" scale={1.5} />
                         </div>
                         <h3 className="text-gradient">Caja de Semillas</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>

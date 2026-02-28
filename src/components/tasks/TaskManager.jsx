@@ -260,7 +260,9 @@ export default function TaskManager() {
                             </motion.div>
                         ) : (
                             <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                                <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🛡️</div>
+                                <div style={{ marginBottom: '1.5rem', opacity: 0.5, display: 'flex', justifyContent: 'center' }}>
+                                    <PixelSprite templateName="sword" baseColor="#94a3b8" scale={2} />
+                                </div>
                                 <p>AWAITING COMBAT</p>
                             </div>
                         )}

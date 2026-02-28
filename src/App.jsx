@@ -14,23 +14,36 @@ import PomodoroTimer from './components/PomodoroTimer';
 import { GameProvider } from './context/GameContext';
 import PixelSprite from './components/PixelSprite';
 
-// 8-Bit Runner Transition Component
-const RunnerTransition = ({ isVisible, direction = 'right' }) => (
+const GlobalLoadingScreen = ({ isVisible }) => (
   <AnimatePresence>
     {isVisible && (
       <motion.div
-        initial={{ x: direction === 'right' ? '-100vw' : '100vw' }}
-        animate={{ x: direction === 'right' ? '100vw' : '-100vw' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 1.5, ease: 'linear' }}
+        transition={{ duration: 0.3 }}
         style={{
-          position: 'fixed', top: '50%', left: 0,
-          transform: 'translateY(-50%)', zIndex: 9999,
-          pointerEvents: 'none',
-          fontSize: '4rem',
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: '#000', zIndex: 9999,
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center'
         }}
       >
-        <PixelSprite templateName="goblin" baseColor="#4ade80" scale={3} />
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ repeat: Infinity, duration: 0.5, ease: "steps(2)" }}
+          style={{ marginBottom: '2rem' }}
+        >
+          <PixelSprite templateName="goblin" baseColor="#4ade80" scale={4} />
+        </motion.div>
+        <motion.h2
+          animate={{ opacity: [1, 0, 1] }}
+          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+          className="text-gradient"
+          style={{ fontSize: '1.2rem', textShadow: '2px 2px #000' }}
+        >
+          Esperando combate...
+        </motion.h2>
       </motion.div>
     )}
   </AnimatePresence>
@@ -45,14 +58,13 @@ function App() {
 
   const handleSessionChange = (newSession) => {
     if (!!newSession !== !!session && !loading) {
-      setTransDirection(newSession ? 'right' : 'left');
       setTransitioning(true);
       setTimeout(() => {
         setSession(newSession);
-      }, 750); // Mid-point of the 1.5s runner animation
+      }, 1500); // Swap session midway through 3s loading
       setTimeout(() => {
         setTransitioning(false);
-      }, 1500);
+      }, 3000); // 3 seconds total loading time
     } else {
       setSession(newSession);
     }
@@ -80,21 +92,13 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex-center min-h-screen">
-        <div className="animate-pulse-glow" style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--accent-primary)' }}></div>
-      </div>
-    );
-  }
-
   return (
     <GameProvider session={session}>
-      <RunnerTransition isVisible={transitioning} direction={transDirection} />
+      <GlobalLoadingScreen isVisible={loading || transitioning} />
       {session && <Navbar />}
       <main className={session ? "container-with-nav" : "container-full"}>
         <AnimatePresence mode="wait">
-          {!transitioning && (
+          {(!loading && !transitioning) && (
             <motion.div
               key={location.pathname + (session ? 'in' : 'out')}
               initial={{ filter: 'blur(10px) grayscale(100%)', opacity: 0 }}
