@@ -98,8 +98,10 @@ export function GameProvider({ children, session }) {
             hp = 100;
         }
 
+        const taskId = isGuest ? 'mock-' + Date.now() : crypto.randomUUID();
+
         const newTask = {
-            id: isGuest ? 'mock-' + Date.now() : undefined,
+            id: taskId,
             title: taskData.title,
             description: taskData.description,
             subtasks_count: taskData.subtasks_count,
@@ -121,8 +123,19 @@ export function GameProvider({ children, session }) {
         if (isGuest) {
             saveToLocal('tasks', updatedTasks);
         } else {
-            // async insert avoiding await stall on UI
-            supabase.from('tasks').insert(newTask).then();
+            const dbNewTask = {
+                id: taskId,
+                title: taskData.title,
+                description: taskData.description,
+                subtasks_count: taskData.subtasks_count,
+                user_id: session.user.id,
+                is_project: isProject,
+                monster_type: isProject ? 'boss' : 'daily',
+                monster_name: monster.name,
+                hp: hp,
+                status: 'pending'
+            };
+            supabase.from('tasks').insert(dbNewTask).then();
         }
     };
 
@@ -175,7 +188,7 @@ export function GameProvider({ children, session }) {
             saveToLocal('profile', updatedProfile);
             saveToLocal('garden', updatedGarden);
         } else {
-            supabase.from('tasks').update({ status: 'completed', completed_at: new Date() }).eq('id', taskId).then();
+            supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId).then();
             supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id).then();
             updatedGarden.forEach(slot => {
                 if (slot.id) supabase.from('garden').update(slot).eq('id', slot.id).then();

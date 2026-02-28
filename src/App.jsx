@@ -61,10 +61,10 @@ function App() {
       setTransitioning(true);
       setTimeout(() => {
         setSession(newSession);
-      }, 1500); // Swap session midway through 3s loading
+      }, 3000); // Swap session midway through 6s loading
       setTimeout(() => {
         setTransitioning(false);
-      }, 3000); // 3 seconds total loading time
+      }, 6000); // 6 seconds total loading time
     } else {
       setSession(newSession);
     }
@@ -77,9 +77,12 @@ function App() {
       return;
     }
 
+    const startLoad = Date.now();
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       handleSessionChange(s);
-      setLoading(false);
+      const elapsed = Date.now() - startLoad;
+      const remaining = Math.max(0, 5000 - elapsed);
+      setTimeout(() => setLoading(false), remaining);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
