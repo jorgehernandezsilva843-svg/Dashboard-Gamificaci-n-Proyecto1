@@ -1,16 +1,37 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameContext';
-import { Plus, CheckCircle, Circle, Skull, Zap } from 'lucide-react';
+import { Plus, CheckCircle, Circle, Skull, Zap, FileText, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PixelSprite from '../PixelSprite';
 
 export default function TaskManager() {
-    const { tasks, addTask, completeTask } = useGame();
+    const { tasks, addTask, completeTask, updateTask, deleteTask } = useGame();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [subtasksCount, setSubtasksCount] = useState(0);
 
     const [activeCombat, setActiveCombat] = useState(null);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [taskNote, setTaskNote] = useState('');
+
+    const handleOpenModal = (task) => {
+        setSelectedTask(task);
+        setTaskNote(task.notes || '');
+    };
+
+    const handleSaveNote = () => {
+        if (selectedTask) {
+            updateTask(selectedTask.id, { notes: taskNote });
+            setSelectedTask(null);
+        }
+    };
+
+    const handleDelete = (id) => {
+        if (window.confirm("¿Seguro que quieres eliminar este monstruo definitivamente?")) {
+            deleteTask(id);
+            setSelectedTask(null);
+        }
+    };
 
     const handleAddTask = async (e) => {
         e.preventDefault();
@@ -98,6 +119,7 @@ export default function TaskManager() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 className="pixel-corners"
+                                onClick={() => handleOpenModal(task)}
                                 style={{
                                     padding: '1rem',
                                     display: 'flex',
@@ -105,11 +127,12 @@ export default function TaskManager() {
                                     gap: '1rem',
                                     background: 'var(--bg-tertiary)',
                                     border: 'var(--pixel-border-sm)',
-                                    borderLeft: task.is_project ? '8px solid var(--danger)' : '8px solid var(--accent-primary)'
+                                    borderLeft: task.is_project ? '8px solid var(--danger)' : '8px solid var(--accent-primary)',
+                                    cursor: 'pointer'
                                 }}
                             >
                                 <button
-                                    onClick={() => handleComplete(task.id)}
+                                    onClick={(e) => { e.stopPropagation(); handleComplete(task.id); }}
                                     className="btn"
                                     style={{ padding: '0.5rem', fontSize: '1rem' }}
                                     title="Attack / Complete"
@@ -139,6 +162,37 @@ export default function TaskManager() {
                             The forest is peaceful. No monsters in sight.
                         </p>
                     )}
+                </div>
+
+                {/* Salón de los Caídos (Completed Tasks) */}
+                <div style={{ marginTop: '2rem' }}>
+                    <h2 className="text-gradient" style={{ textShadow: '2px 2px #000', fontSize: '1.2rem' }}>El Salón de los Caídos</h2>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.8rem' }}>Bestiario de Victorias.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+                        {tasks.filter(t => t.status === 'completed').map(task => (
+                            <div
+                                key={task.id}
+                                className="pixel-corners glass-card"
+                                onClick={() => handleOpenModal(task)}
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: '1rem',
+                                    textAlign: 'center',
+                                    filter: 'grayscale(100%) opacity(0.7)',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                                }}
+                            >
+                                <span style={{ filter: `drop-shadow(0 0 5px #fff)` }}>
+                                    <PixelSprite templateName={task.monster_sprite || (task.is_project ? 'boss_default' : 'slime')} baseColor={'#fff'} scale={0.6} />
+                                </span>
+                                <div style={{ fontSize: '0.55rem', color: 'var(--danger)', fontWeight: 'bold', border: '1px solid var(--danger)', padding: '2px 4px', background: '#000' }}>[ DERROTADO ]</div>
+                                <h4 style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{task.title}</h4>
+                            </div>
+                        ))}
+                        {tasks.filter(t => t.status === 'completed').length === 0 && (
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Ningún monstruo ha sido derrotado aún.</p>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -211,6 +265,64 @@ export default function TaskManager() {
                 </div>
             </div>
 
+            {/* Task Notes / Edit Modal */}
+            <AnimatePresence>
+                {selectedTask && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.8)', zIndex: 1100,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="glass-panel"
+                            style={{ width: '90%', maxWidth: '500px', padding: '2rem', background: 'var(--bg-primary)' }}
+                        >
+                            <div className="flex-between" style={{ marginBottom: '1.5rem', borderBottom: 'var(--pixel-border-sm)', paddingBottom: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <span style={{ filter: `drop-shadow(0 0 5px ${selectedTask.monster_color || '#fff'})` }}>
+                                        <PixelSprite templateName={selectedTask.monster_sprite || 'slime'} baseColor={selectedTask.monster_color || '#fff'} scale={0.6} />
+                                    </span>
+                                    <div>
+                                        <h3 style={{ color: selectedTask.status === 'completed' ? 'var(--text-muted)' : 'var(--text-primary)', textDecoration: selectedTask.status === 'completed' ? 'line-through' : 'none' }}>
+                                            {selectedTask.title}
+                                        </h3>
+                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{selectedTask.monster_name}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setSelectedTask(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <div className="input-group">
+                                <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <FileText size={14} /> APUNTES / NOTAS DE LA TAREA
+                                </label>
+                                <textarea
+                                    className="input-field"
+                                    rows="6"
+                                    value={taskNote}
+                                    onChange={(e) => setTaskNote(e.target.value)}
+                                    placeholder="Escribe aquí los detalles, links o apuntes relacionados a esta tarea..."
+                                    style={{ resize: 'vertical' }}
+                                />
+                            </div>
+
+                            <div className="flex-between" style={{ marginTop: '2rem' }}>
+                                <button className="btn" style={{ background: 'var(--danger)', color: 'white' }} onClick={() => handleDelete(selectedTask.id)}>
+                                    <Trash2 size={16} /> [ BORRAR ]
+                                </button>
+                                <button className="btn btn-primary" onClick={handleSaveNote}>
+                                    [ GUARDAR ]
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

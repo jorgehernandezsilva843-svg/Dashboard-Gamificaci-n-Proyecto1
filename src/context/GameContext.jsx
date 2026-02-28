@@ -188,6 +188,26 @@ export function GameProvider({ children, session }) {
         return { xpGained, coinsGained, task };
     };
 
+    const updateTask = async (taskId, updates) => {
+        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, ...updates } : t);
+        setTasks(updatedTasks);
+        if (isGuest) {
+            saveToLocal('tasks', updatedTasks);
+        } else {
+            supabase.from('tasks').update(updates).eq('id', taskId).then();
+        }
+    };
+
+    const deleteTask = async (taskId) => {
+        const updatedTasks = tasks.filter(t => t.id !== taskId);
+        setTasks(updatedTasks);
+        if (isGuest) {
+            saveToLocal('tasks', updatedTasks);
+        } else {
+            supabase.from('tasks').delete().eq('id', taskId).then();
+        }
+    };
+
     const updateProfile = async (updates) => {
         const updatedProfile = { ...profile, ...updates };
         setProfile(updatedProfile);
@@ -237,7 +257,7 @@ export function GameProvider({ children, session }) {
     };
 
     return (
-        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal }}>
+        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, refetch: fetchData, setGarden, saveToLocal }}>
             {children}
         </GameContext.Provider>
     );

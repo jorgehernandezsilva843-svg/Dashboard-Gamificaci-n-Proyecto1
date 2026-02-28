@@ -72,12 +72,12 @@ export default function Store() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
 
                 {/* Distilled Water */}
-                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.2)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
                         <Droplets size={30} />
                     </div>
                     <h3>Agua Destilada</h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '1rem 0', height: '60px' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
                         Mantiene vivas tus plantas. Necesaria para que el temporizador de focus no se detenga.
                     </p>
                     <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => buyConsumable(10, 'Agua Destilada')}>
@@ -86,12 +86,12 @@ export default function Store() {
                 </div>
 
                 {/* Premium Fertilizer */}
-                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
                         <Sparkles size={30} />
                     </div>
                     <h3>Fertilizante Premium</h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '1rem 0', height: '60px' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
                         Acelera el tiempo de crecimiento de un slot en 1 etapa.
                     </p>
                     <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => buyConsumable(50, 'Fertilizante Premium')}>
@@ -100,17 +100,17 @@ export default function Store() {
                 </div>
 
                 {/* Gacha Box */}
-                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', border: '1px solid var(--accent-primary)', position: 'relative', overflow: 'hidden' }}>
+                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center', border: '1px solid var(--accent-primary)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div className="animate-pulse-glow" style={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)', zIndex: 0 }} />
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--accent-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 0 20px var(--accent-glow)' }}>
+                    <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--accent-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', boxShadow: '0 0 20px var(--accent-glow)' }}>
                             <Package size={40} />
                         </div>
                         <h3 className="text-gradient">Caja de Semillas</h3>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '1rem 0', height: '60px' }}>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 'auto' }}>
                             Contiene una semilla aleatoria. ¡Incluso podría soltar una del Mercado Negro (0.1%)!
                         </p>
-                        <button className="btn btn-primary" style={{ width: '100%' }} onClick={triggerGacha} disabled={purchasing}>
+                        <button className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} onClick={triggerGacha} disabled={purchasing}>
                             {purchasing ? 'Abriendo...' : 'Abrir Gacha (100 \uD83D\uDC8E)'}
                         </button>
                     </div>

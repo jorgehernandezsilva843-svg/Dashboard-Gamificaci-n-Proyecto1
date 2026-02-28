@@ -39,8 +39,8 @@ export default function Navbar() {
             borderRadius: '0 var(--radius-lg) var(--radius-lg) 0',
             borderLeft: 'none'
         }}>
-            <div style={{ marginBottom: '3rem' }}>
-                <h2 className="text-gradient">QuestBloom</h2>
+            <div style={{ marginBottom: '3rem', padding: '0.5rem', width: 'auto' }}>
+                <h2 className="text-gradient" style={{ fontSize: '1.2rem' }}>QuestBloom</h2>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
@@ -93,7 +93,8 @@ export default function Navbar() {
                 display: 'flex', gap: '1rem',
                 padding: '0.5rem 1rem',
                 zIndex: 1000,
-                background: 'var(--bg-secondary)',
+                background: 'rgba(0, 0, 0, 0.6)',
+                pointerEvents: 'none'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-tertiary)' }}>
                     <PixelSprite templateName="coin" baseColor="#fbbf24" scale={0.4} />
