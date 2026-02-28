@@ -104,9 +104,9 @@ function App() {
           {(!loading && !transitioning) && (
             <motion.div
               key={location.pathname + (session ? 'in' : 'out')}
-              initial={{ filter: 'blur(10px) grayscale(100%)', opacity: 0 }}
-              animate={{ filter: 'blur(0px) grayscale(0%)', opacity: 1 }}
-              exit={{ filter: 'blur(10px) grayscale(100%)', opacity: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               style={{ width: '100%', height: '100%' }}
             >

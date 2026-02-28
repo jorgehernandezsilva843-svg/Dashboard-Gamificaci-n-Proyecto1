@@ -35,9 +35,29 @@ export default function Garden() {
             const seedToPlant = seeds[0];
             await updateInventory(seedToPlant.item_name, -1, 'seed', seedToPlant.rarity);
 
-            const updatedGarden = garden.map(g => g.slot_index === slotIndex ? {
-                ...g, stage: 'seed', seed_id: seedToPlant.item_name, tasks_completed_since_plant: 0, needs_water: false, is_wilted: false
-            } : g);
+            let updatedGarden = [...garden];
+            let targetSlotIndex = updatedGarden.findIndex(g => g.slot_index === slotIndex);
+
+            if (targetSlotIndex !== -1) {
+                updatedGarden[targetSlotIndex] = {
+                    ...updatedGarden[targetSlotIndex],
+                    stage: 'seed',
+                    seed_id: seedToPlant.item_name,
+                    tasks_completed_since_plant: 0,
+                    needs_water: false,
+                    is_wilted: false
+                };
+            } else {
+                updatedGarden.push({
+                    slot_index: slotIndex,
+                    stage: 'seed',
+                    seed_id: seedToPlant.item_name,
+                    tasks_completed_since_plant: 0,
+                    needs_water: false,
+                    is_wilted: false
+                });
+            }
+
             await syncGarden(updatedGarden);
         }
     };

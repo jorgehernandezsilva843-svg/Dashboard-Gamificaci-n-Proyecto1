@@ -318,19 +318,44 @@ export function GameProvider({ children, session }) {
 
     const syncGarden = async (updatedGarden) => {
         setGarden(updatedGarden);
+
         if (isGuest) {
             saveToLocal('garden', updatedGarden);
-        } else {
-            await Promise.all(
-                updatedGarden.map(slot => {
-                    if (slot.id) {
-                        const { id, user_id, planted_at, ...updateData } = slot;
-                        return supabase.from('garden').update(updateData).eq('id', slot.id);
-                    }
-                    return Promise.resolve();
-                })
-            );
+            return;
         }
+
+        const promises = updatedGarden.map(async (slot) => {
+            if (slot.id) {
+                const { id, user_id, planted_at, ...updateData } = slot;
+                const { error } = await supabase.from('garden').update(updateData).eq('id', slot.id);
+                if (error) console.error("Update Garden Error:", error);
+                return;
+            }
+
+            // Create new slot
+            if (slot.stage !== 'empty') {
+                const newSlotData = {
+                    user_id: profile.id,
+                    slot_index: slot.slot_index,
+                    stage: slot.stage,
+                    seed_id: slot.seed_id,
+                    tasks_completed_since_plant: slot.tasks_completed_since_plant,
+                    needs_water: slot.needs_water,
+                    is_wilted: slot.is_wilted
+                };
+
+                const { data, error } = await supabase.from('garden').insert(newSlotData).select().single();
+
+                if (error) {
+                    console.error("Insert Garden Error:", error);
+                } else if (data) {
+                    // Update local state asynchronously with the newly generated DB ID
+                    setGarden(prev => prev.map(g => g.slot_index === slot.slot_index ? { ...g, id: data.id } : g));
+                }
+            }
+        });
+
+        await Promise.all(promises);
     };
 
     return (
