@@ -59,9 +59,14 @@ export function GameProvider({ children, session }) {
         setLoading(false);
     };
 
+    // Función de Sincronización Principal (Real-Time emulation via Promise.all)
     const fetchData = async () => {
         setLoading(true);
         try {
+            // [Supabase DB Queries]: Múltiples peticiones a tablas protegidas por RLS.
+            // Extrae concurrentemente el perfil, inventario, progreso del jardín 
+            // y la lista de tareas activas filtradas automáticamente por el 'user.id'
+            // de la sesión actual verificada.
             const [profileData, tasksData, gardenData, invData] = await Promise.all([
                 supabase.from('profiles').select('*').eq('id', session.user.id).single(),
                 supabase.from('tasks').select('*').eq('user_id', session.user.id).order('created_at', { ascending: false }),
@@ -188,6 +193,9 @@ export function GameProvider({ children, session }) {
             saveToLocal('profile', updatedProfile);
             saveToLocal('garden', updatedGarden);
         } else {
+            // [Optimistic UI]: Primero se actualizan los arreglos locales en memoria de React,
+            // y luego se despachan las instrucciones a Supabase asíncronamente (.then()) sin usar 'await',
+            // lo que evita congelar la UI si hay latencia de red.
             supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId).then();
             supabase.from('profiles').update({ xp: newXp, coins: newCoins, level: newLevel }).eq('id', profile.id).then();
             updatedGarden.forEach(slot => {

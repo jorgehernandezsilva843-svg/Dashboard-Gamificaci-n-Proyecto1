@@ -28,19 +28,22 @@ Probabilidades base de la Caja:
 - **Exótica**: 4.9%
 - **Mercado Negro**: 0.1% (Animaciones celestiales y plantas extremadamente únicas como la 'Enredadera del Caos').
 
-## Demo (Modo Invitado)
-
-La app está diseñada con un **Modo Invitado** que provee de "Mock Data" si decides probarla sin configurar un backend. Podrás interactuar con los layouts de tareas, la tienda y el jardín con algunas plantas ya desplegadas (como el Bonsái Galáctico).
+## Sincronización en la Nube
+El proyecto está completamente conectado a un backend en **Supabase** (PostgreSQL). Todo tu progreso: las monedas, la experiencia, tu jardín pixelado y los monstruos derrotados se guardan en la nube en tiempo real. Esto te permite iniciar sesión desde cualquier dispositivo y continuar tu aventura justo donde la dejaste.
 
 ## Despliegue Técnico
-- **Framework:** React + Vite
-- **Animaciones:** Framer Motion y canvas-confetti.
-- **Base de Datos/Auth:** Supabase (PostgreSQL), protegiendo la visibilidad a través de Row Level Security (RLS).
-- **Estética:** Glassmorphism, CSS Modules dinámico y Variables para modo oscuro con resplandores mágicos.
+- **Frontend:** React + Vite
+- **Animaciones:** Framer Motion y recursos Pixel Art puros elaborados con CSS y componentes SVG/Matrices.
+- **Base de Datos/Auth:** Supabase (PostgreSQL), protegiendo la visibilidad a través de Row Level Security (RLS) y Triggers automáticos.
+- **Estética:** Estilo 8-Bits y Retro, simulando consolas antiguas y RPGs clásicos (sin uso de emojis modernos).
 
 ## Estructura Local
-Para correr el proyecto localmente (si conectaste el Supabase, configura tu archivo `.env`):
-```bash
+Para correr el proyecto localmente, debes configurar tu archivo `.env` en la raíz del proyecto para conectar tu propia base de datos de Supabase:
+
+```env
+VITE_SUPABASE_URL=tu_url_aqui
+VITE_SUPABASE_ANON_KEY=tu_anon_key_aqui
+```
 # Instalar dependencias
 npm install
 

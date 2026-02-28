@@ -11,6 +11,7 @@ export default function Auth() {
     const [error, setError] = useState(null);
     const [message, setMessage] = useState(null);
 
+    // Función principal que maneja el Registro (SignUp) y el Ingreso (SignIn)
     const handleAuth = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -19,12 +20,18 @@ export default function Auth() {
 
         try {
             if (isLogin) {
+                // [Supabase DB Query]: Petición de inicio de sesión con correo y contraseña.
+                // Supabase validará internamente el hash de la contraseña y devolverá una sesión (JWT).
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
                 });
                 if (error) throw error;
             } else {
+                // [Supabase DB Query]: Petición de registro de nuevo usuario.
+                // Se envía el correo, la contraseña y un objeto 'data' (User Meta Data)
+                // que es atrapado por el Trigger SQL (handle_new_user) en el Backend 
+                // para guardar el 'username' en la tabla pública de 'profiles'.
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
