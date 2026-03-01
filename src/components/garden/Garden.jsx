@@ -14,6 +14,8 @@ export default function Garden() {
     const [showFusionModal, setShowFusionModal] = useState(false);
     const [fusing, setFusing] = useState(false);
     const [fusionResult, setFusionResult] = useState(null);
+    const [isSeedMenuOpen, setIsSeedMenuOpen] = useState(false);
+    const [selectedSlotIndex, setSelectedSlotIndex] = useState(null);
 
     const handleSlotClick = async (slotIndex) => {
         const slot = garden.find(g => g.slot_index === slotIndex);
@@ -44,41 +46,54 @@ export default function Garden() {
         }
 
         if (slot.stage === 'empty') {
-            const seeds = inventory.filter(i => i.item_type === 'seed');
+            const seeds = inventory.filter(i => i.item_type === 'seed' && i.quantity > 0);
             if (seeds.length === 0) {
-                await showAlert('¡No tienes semillas! Consigue una en la tienda.', 'SIN SEMILLAS');
+                await showAlert('Tu bolsa está vacía. Consigue semillas en la tienda.', 'SIN SEMILLAS');
                 return;
             }
-            const seedToPlant = seeds[0];
-            await updateInventory(seedToPlant.item_name, -1, 'seed', seedToPlant.rarity);
-
-            let updatedGarden = [...garden];
-            let targetSlotIndex = updatedGarden.findIndex(g => g.slot_index === slotIndex);
-
-            if (targetSlotIndex !== -1) {
-                updatedGarden[targetSlotIndex] = {
-                    ...updatedGarden[targetSlotIndex],
-                    stage: 'seed',
-                    seed_id: seedToPlant.item_name,
-                    tasks_completed_since_plant: 0,
-                    needs_water: false,
-                    is_wilted: false,
-                    needs_fertilizer: false
-                };
-            } else {
-                updatedGarden.push({
-                    slot_index: slotIndex,
-                    stage: 'seed',
-                    seed_id: seedToPlant.item_name,
-                    tasks_completed_since_plant: 0,
-                    needs_water: false,
-                    is_wilted: false,
-                    needs_fertilizer: false
-                });
-            }
-
-            await syncGarden(updatedGarden);
+            setSelectedSlotIndex(slotIndex);
+            setIsSeedMenuOpen(true);
         }
+    };
+
+    const confirmPlanting = async (seedToPlant) => {
+        // Find seed color/rarity info
+        let r = seedToPlant.rarity;
+        if (!r) {
+            const found = SEED_CATALOG.find(s => s.name === seedToPlant.item_name);
+            r = found ? found.rarity : 'Común';
+        }
+
+        await updateInventory(seedToPlant.item_name, -1, 'seed', r);
+
+        let updatedGarden = [...garden];
+        let targetSlotIndex = updatedGarden.findIndex(g => g.slot_index === selectedSlotIndex);
+
+        if (targetSlotIndex !== -1) {
+            updatedGarden[targetSlotIndex] = {
+                ...updatedGarden[targetSlotIndex],
+                stage: 'seed',
+                seed_id: seedToPlant.item_name,
+                tasks_completed_since_plant: 0,
+                needs_water: false,
+                is_wilted: false,
+                needs_fertilizer: false
+            };
+        } else {
+            updatedGarden.push({
+                slot_index: selectedSlotIndex,
+                stage: 'seed',
+                seed_id: seedToPlant.item_name,
+                tasks_completed_since_plant: 0,
+                needs_water: false,
+                is_wilted: false,
+                needs_fertilizer: false
+            });
+        }
+
+        await syncGarden(updatedGarden);
+        setIsSeedMenuOpen(false);
+        setSelectedSlotIndex(null);
     };
 
     const getSeedCountByRarity = (rarity) => {
@@ -381,6 +396,79 @@ export default function Garden() {
                             </p>
                             <button className="btn" style={{ background: fusionResult.color }} onClick={() => setFusionResult(null)}>
                                 ALMACENAR
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Seed Inventory Selection Modal */}
+            <AnimatePresence>
+                {isSeedMenuOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm w-screen h-screen overflow-hidden" onClick={() => setIsSeedMenuOpen(false)}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: 50 }}
+                            className="relative z-[101] max-w-[90vw] max-h-[80vh] overflow-y-auto"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                padding: '2rem',
+                                border: `var(--pixel-border)`,
+                                background: 'var(--bg-secondary)',
+                                boxShadow: `var(--shadow-retro)`,
+                                width: '400px',
+                                display: 'flex',
+                                flexDirection: 'column'
+                            }}
+                        >
+                            <h2 className="text-gradient" style={{ marginBottom: '1.5rem', fontSize: '1.2rem', textAlign: 'center' }}>
+                                [ INVENTARIO DE SEMILLAS ]
+                            </h2>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                {inventory
+                                    .filter(i => i.item_type === 'seed' && i.quantity > 0)
+                                    .map(seed => {
+                                        const catalogInfo = SEED_CATALOG.find(s => s.name === seed.item_name) || { color: '#ffffff' };
+                                        return (
+                                            <button
+                                                key={seed.item_name}
+                                                className="btn btn-secondary"
+                                                onClick={() => confirmPlanting(seed)}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    padding: '0.8rem',
+                                                    width: '100%',
+                                                    background: '#111',
+                                                    border: `2px solid ${catalogInfo.color}`,
+                                                    textAlign: 'left'
+                                                }}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                    <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <PixelSprite templateName="seed" baseColor={catalogInfo.color} scale={0.6} />
+                                                    </div>
+                                                    <span style={{ fontSize: '0.8rem', color: catalogInfo.color }}>
+                                                        {seed.item_name}
+                                                    </span>
+                                                </div>
+                                                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                                    x{seed.quantity}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                            </div>
+
+                            <button
+                                className="btn"
+                                style={{ marginTop: '1.5rem', background: '#eab308', color: '#000', width: '100%' }}
+                                onClick={() => setIsSeedMenuOpen(false)}
+                            >
+                                CANCELAR
                             </button>
                         </motion.div>
                     </div>
