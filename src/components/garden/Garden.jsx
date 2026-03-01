@@ -79,7 +79,10 @@ export default function Garden() {
     };
 
     const getSeedCountByRarity = (rarity) => {
-        return inventory.filter(i => i.item_type === 'seed' && i.rarity === rarity).reduce((sum, i) => sum + i.quantity, 0);
+        const normalizedRarity = rarity.toLowerCase().trim();
+        return inventory
+            .filter(i => i.item_type === 'seed' && i.rarity && i.rarity.toLowerCase().trim() === normalizedRarity)
+            .reduce((sum, i) => sum + i.quantity, 0);
     };
 
     const handleFusion = async (sourceRarity, cost, targetRarity) => {

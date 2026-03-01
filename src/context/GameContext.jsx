@@ -306,11 +306,13 @@ export function GameProvider({ children, session }) {
 
     const consumeSeedsByRarity = async (targetRarity, count) => {
         let remainingToConsume = count;
+        const normalizedTarget = targetRarity.toLowerCase().trim();
         // deep copy inventory values to mutate
         const updatedInv = inventory.map(item => ({ ...item }));
 
         for (let item of updatedInv) {
-            if (item.item_type === 'seed' && item.rarity === targetRarity && remainingToConsume > 0) {
+            const itemRarity = item.rarity ? item.rarity.toLowerCase().trim() : '';
+            if (item.item_type === 'seed' && itemRarity === normalizedTarget && remainingToConsume > 0) {
                 const consumed = Math.min(item.quantity, remainingToConsume);
                 item.quantity -= consumed;
                 remainingToConsume -= consumed;
