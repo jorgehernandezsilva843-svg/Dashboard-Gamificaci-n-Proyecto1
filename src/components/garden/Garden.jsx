@@ -405,24 +405,15 @@ export default function Garden() {
             {/* Seed Inventory Selection Modal */}
             <AnimatePresence>
                 {isSeedMenuOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm w-screen h-screen overflow-hidden" onClick={() => setIsSeedMenuOpen(false)}>
+                    <div className="fixed top-0 left-0 w-screen h-screen z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setIsSeedMenuOpen(false)}>
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8, y: 50 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.8, y: 50 }}
-                            className="relative z-[101] max-w-[90vw] max-h-[80vh] overflow-y-auto"
+                            className="relative bg-gray-900 border-4 border-white p-6 w-[90%] max-w-md max-h-[80vh] overflow-y-auto z-[1000] flex flex-col gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
                             onClick={(e) => e.stopPropagation()}
-                            style={{
-                                padding: '2rem',
-                                border: `var(--pixel-border)`,
-                                background: 'var(--bg-secondary)',
-                                boxShadow: `var(--shadow-retro)`,
-                                width: '400px',
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}
                         >
-                            <h2 className="text-gradient" style={{ marginBottom: '1.5rem', fontSize: '1.2rem', textAlign: 'center' }}>
+                            <h2 className="text-gradient text-center text-xl mb-4" style={{ fontFamily: '"Press Start 2P", cursive' }}>
                                 [ INVENTARIO DE SEMILLAS ]
                             </h2>
 
