@@ -305,46 +305,82 @@ export function GameProvider({ children, session }) {
         }
     };
 
-    const consumeSeedsByRarity = async (targetRarity, count) => {
-        let remainingToConsume = count;
-        const normalizedTarget = targetRarity.toLowerCase().trim();
-        // deep copy inventory values to mutate
-        const updatedInv = inventory.map(item => ({ ...item }));
+    const executeFusion = async (sourceRarity, cost, newSeedData) => {
+        let remainingToConsume = cost;
+        const normalizedSource = sourceRarity.toLowerCase().trim();
+        let updatedInv = inventory.map(item => ({ ...item }));
 
+        const dbPromises = [];
+        let uid = null;
+        if (!isGuest) {
+            const { data: sessionData } = await supabase.auth.getSession();
+            uid = sessionData?.session?.user?.id;
+        }
+
+        // 1. Subtract source seeds
         for (let item of updatedInv) {
             let r = item.rarity;
             if (!r) {
                 const found = SEED_CATALOG.find(s => s.name === item.item_name);
                 r = found ? found.rarity : '';
             }
-
             const itemRarity = r ? r.toLowerCase().trim() : '';
-            if (item.item_type === 'seed' && itemRarity === normalizedTarget && remainingToConsume > 0) {
+
+            if (item.item_type === 'seed' && itemRarity === normalizedSource && remainingToConsume > 0) {
                 const consumed = Math.min(item.quantity, remainingToConsume);
                 item.quantity -= consumed;
                 remainingToConsume -= consumed;
 
-                if (!isGuest) {
-                    try {
-                        const { data: sessionData } = await supabase.auth.getSession();
-                        const uid = sessionData?.session?.user?.id;
-                        if (uid) {
-                            if (item.quantity === 0) {
-                                await supabase.from('inventory').delete().eq('user_id', uid).eq('item_name', item.item_name);
-                            } else {
-                                await supabase.from('inventory').update({ quantity: item.quantity }).eq('user_id', uid).eq('item_name', item.item_name);
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Error in consumeSeedsByRarity sync:', e);
+                if (uid) {
+                    if (item.quantity === 0) {
+                        dbPromises.push(supabase.from('inventory').delete().eq('user_id', uid).eq('item_name', item.item_name));
+                    } else {
+                        dbPromises.push(supabase.from('inventory').update({ quantity: item.quantity }).eq('user_id', uid).eq('item_name', item.item_name));
                     }
                 }
             }
         }
 
-        const filteredInv = updatedInv.filter(i => i.quantity > 0);
-        setInventory(filteredInv);
-        if (isGuest) saveToLocal('inventory', filteredInv);
+        updatedInv = updatedInv.filter(i => i.quantity > 0);
+
+        // 2. Add target seed
+        let exists = false;
+        updatedInv = updatedInv.map(item => {
+            if (item.item_name === newSeedData.name) {
+                exists = true;
+                return { ...item, quantity: item.quantity + 1 };
+            }
+            return item;
+        });
+
+        if (!exists) {
+            updatedInv.push({
+                id: `inv_${Date.now()}`,
+                item_name: newSeedData.name,
+                quantity: 1,
+                item_type: 'seed',
+                rarity: newSeedData.rarity
+            });
+            if (uid) {
+                dbPromises.push(supabase.from('inventory').insert({ user_id: uid, item_name: newSeedData.name, quantity: 1, item_type: 'seed', rarity: newSeedData.rarity }));
+            }
+        } else if (uid) {
+            const target = updatedInv.find(i => i.item_name === newSeedData.name);
+            dbPromises.push(supabase.from('inventory').update({ quantity: target.quantity }).eq('user_id', uid).eq('item_name', newSeedData.name));
+        }
+
+        // Apply final single state update
+        setInventory(updatedInv);
+
+        if (isGuest) {
+            saveToLocal('inventory', updatedInv);
+        } else if (dbPromises.length > 0) {
+            try {
+                await Promise.all(dbPromises);
+            } catch (e) {
+                console.error('Error in executeFusion sync:', e);
+            }
+        }
     };
 
     const removePlant = async (slotIndex) => {
@@ -407,7 +443,7 @@ export function GameProvider({ children, session }) {
     };
 
     return (
-        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, consumeSeedsByRarity, refetch: fetchData, setGarden, saveToLocal, removePlant, syncGarden }}>
+        <GameContext.Provider value={{ profile, tasks, garden, inventory, loading, isGuest, addTask, completeTask, updateTask, deleteTask, updateProfile, updateInventory, executeFusion, refetch: fetchData, setGarden, saveToLocal, removePlant, syncGarden }}>
             {children}
         </GameContext.Provider>
     );

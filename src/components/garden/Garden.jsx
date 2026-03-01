@@ -6,11 +6,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SEED_CATALOG, getRandomSeedByRarity } from '../../data/catalog';
 import PixelSprite from '../PixelSprite';
 import { Trash2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 export default function Garden() {
-    const { garden, loading, inventory, updateInventory, consumeSeedsByRarity, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
+    const { garden, loading, inventory, updateInventory, executeFusion, setGarden, saveToLocal, isGuest, removePlant, syncGarden } = useGame();
     const { showAlert, showConfirm } = useModal();
     const [showFusionModal, setShowFusionModal] = useState(false);
+    const [fusing, setFusing] = useState(false);
+    const [fusionResult, setFusionResult] = useState(null);
 
     const handleSlotClick = async (slotIndex) => {
         const slot = garden.find(g => g.slot_index === slotIndex);
@@ -100,13 +103,26 @@ export default function Garden() {
             return;
         }
 
+        setFusing(true);
+        setFusionResult(null);
+
+        // Simulate animation delay
+        await new Promise(r => setTimeout(r, 1000));
+
         const newSeed = getRandomSeedByRarity(targetRarity);
 
-        await consumeSeedsByRarity(sourceRarity, cost);
-        await updateInventory(newSeed.name, 1, 'seed', targetRarity);
+        await executeFusion(sourceRarity, cost, newSeed);
 
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: [newSeed.color, '#ffffff']
+        });
+
+        setFusionResult({ rarity: targetRarity, seedName: newSeed.name, color: newSeed.color });
+        setFusing(false);
         setShowFusionModal(false);
-        await showAlert(`¡Laboratorio exitoso! Se restaron ${cost} semillas [${sourceRarity}]. HAS OBTENIDO: x1 ${newSeed.name} (${targetRarity})`, 'NUEVA SEMILLA CREADA');
     };
 
     const handleRemovePlant = async (e, slotIndex) => {
@@ -312,19 +328,60 @@ export default function Garden() {
                                 Fusiona semillas de menor rareza para transmutarlas en semillas superiores aleatorias.
                             </p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                                <button className="btn" style={{ background: '#3b82f6' }} onClick={() => handleFusion('Común', 2, 'Rara')}>
-                                    [ 2 COMUNES ] ➔ 1 RARA (Tienes {getSeedCountByRarity('Común')})
+                                <button className="btn" style={{ background: '#3b82f6', opacity: fusing ? 0.5 : 1 }} onClick={() => handleFusion('Común', 2, 'Rara')} disabled={fusing}>
+                                    {fusing ? 'FUSIONANDO...' : `[ 2 COMUNES ] ➔ 1 RARA (Tienes ${getSeedCountByRarity('Común')})`}
                                 </button>
-                                <button className="btn" style={{ background: '#fbbf24', color: '#000' }} onClick={() => handleFusion('Rara', 3, 'Épica')}>
-                                    [ 3 RARAS ] ➔ 1 ÉPICA (Tienes {getSeedCountByRarity('Rara')})
+                                <button className="btn" style={{ background: '#fbbf24', color: '#000', opacity: fusing ? 0.5 : 1 }} onClick={() => handleFusion('Rara', 3, 'Épica')} disabled={fusing}>
+                                    {fusing ? 'FUSIONANDO...' : `[ 3 RARAS ] ➔ 1 ÉPICA (Tienes ${getSeedCountByRarity('Rara')})`}
                                 </button>
-                                <button className="btn" style={{ background: '#ec4899', color: 'white' }} onClick={() => handleFusion('Épica', 4, 'Exótica')}>
-                                    [ 4 ÉPICAS ] ➔ 1 EXÓTICA (Tienes {getSeedCountByRarity('Épica')})
+                                <button className="btn" style={{ background: '#ec4899', color: 'white', opacity: fusing ? 0.5 : 1 }} onClick={() => handleFusion('Épica', 4, 'Exótica')} disabled={fusing}>
+                                    {fusing ? 'FUSIONANDO...' : `[ 4 ÉPICAS ] ➔ 1 EXÓTICA (Tienes ${getSeedCountByRarity('Épica')})`}
                                 </button>
-                                <button className="btn" style={{ background: '#581c87', color: 'white' }} onClick={() => handleFusion('Exótica', 5, 'Mercado Negro')}>
-                                    [ 5 EXÓTICAS ] ➔ 1 MERC. NEGRO (Tienes {getSeedCountByRarity('Exótica')})
+                                <button className="btn" style={{ background: '#581c87', color: 'white', opacity: fusing ? 0.5 : 1 }} onClick={() => handleFusion('Exótica', 5, 'Mercado Negro')} disabled={fusing}>
+                                    {fusing ? 'FUSIONANDO...' : `[ 5 EXÓTICAS ] ➔ 1 MERC. NEGRO (Tienes ${getSeedCountByRarity('Exótica')})`}
                                 </button>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Fusion Result Modal */}
+            <AnimatePresence>
+                {fusionResult && (
+                    <div className="modal-backdrop-fixed" onClick={() => setFusionResult(null)}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="glass-panel modal-content-relative"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                padding: '2rem', textAlign: 'center', border: `var(--pixel-border)`,
+                                boxShadow: `0 0 40px ${fusionResult.color}80, var(--shadow-retro)`,
+                                width: '90vw', maxWidth: '400px', background: 'var(--bg-secondary)'
+                            }}
+                        >
+                            <h2 style={{ color: fusionResult.color, marginBottom: '1rem', fontSize: '1.2rem', textShadow: '2px 2px #000' }}>
+                                ¡Fusión Exitosa!
+                            </h2>
+                            <div style={{
+                                fontSize: '4rem', margin: '2rem auto',
+                                background: '#000', width: '100px', height: '100px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                border: `var(--pixel-border-sm)`, borderRadius: '0'
+                            }}>
+                                <PixelSprite templateName="seed" baseColor={fusionResult.color} scale={1.5} />
+                            </div>
+                            <h3 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                                {fusionResult.seedName}
+                            </h3>
+                            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.75rem' }}>
+                                Rareza Resultante: <strong style={{ color: fusionResult.color }}>{fusionResult.rarity}</strong>
+                            </p>
+                            <button className="btn" style={{ background: fusionResult.color }} onClick={() => setFusionResult(null)}>
+                                ALMACENAR
+                            </button>
                         </motion.div>
                     </div>
                 )}
