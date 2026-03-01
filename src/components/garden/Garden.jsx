@@ -81,7 +81,15 @@ export default function Garden() {
     const getSeedCountByRarity = (rarity) => {
         const normalizedRarity = rarity.toLowerCase().trim();
         return inventory
-            .filter(i => i.item_type === 'seed' && i.rarity && i.rarity.toLowerCase().trim() === normalizedRarity)
+            .filter(i => {
+                if (i.item_type !== 'seed') return false;
+                let r = i.rarity;
+                if (!r) {
+                    const found = SEED_CATALOG.find(s => s.name === i.item_name);
+                    r = found ? found.rarity : '';
+                }
+                return r && r.toLowerCase().trim() === normalizedRarity;
+            })
             .reduce((sum, i) => sum + i.quantity, 0);
     };
 

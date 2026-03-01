@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { getRandomDailyMonster, getRandomBossMonster } from '../data/bestiary';
+import { SEED_CATALOG } from '../data/catalog';
 
 const GameContext = createContext();
 
@@ -311,7 +312,13 @@ export function GameProvider({ children, session }) {
         const updatedInv = inventory.map(item => ({ ...item }));
 
         for (let item of updatedInv) {
-            const itemRarity = item.rarity ? item.rarity.toLowerCase().trim() : '';
+            let r = item.rarity;
+            if (!r) {
+                const found = SEED_CATALOG.find(s => s.name === item.item_name);
+                r = found ? found.rarity : '';
+            }
+
+            const itemRarity = r ? r.toLowerCase().trim() : '';
             if (item.item_type === 'seed' && itemRarity === normalizedTarget && remainingToConsume > 0) {
                 const consumed = Math.min(item.quantity, remainingToConsume);
                 item.quantity -= consumed;
