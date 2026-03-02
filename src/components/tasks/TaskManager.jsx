@@ -11,6 +11,9 @@ export default function TaskManager() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [subtasksCount, setSubtasksCount] = useState(0);
+    const [dungeon, setDungeon] = useState('');
+    const [dueDate, setDueDate] = useState('');
+    const [difficulty, setDifficulty] = useState('Sencilla');
 
     const [activeCombat, setActiveCombat] = useState(null);
     const [selectedTask, setSelectedTask] = useState(null);
@@ -18,13 +21,13 @@ export default function TaskManager() {
 
     const handleOpenModal = (task) => {
         setSelectedTask(task);
-        setTaskNote(task.notes || '');
+        setTaskNote(task.description || '');
     };
 
     const handleSaveNote = () => {
         if (selectedTask) {
-            updateTask(selectedTask.id, { notes: taskNote });
-            setSelectedTask(null);
+            updateTask(selectedTask.id, { description: taskNote });
+            setSelectedTask({ ...selectedTask, description: taskNote });
         }
     };
 
@@ -43,12 +46,18 @@ export default function TaskManager() {
         await addTask({
             title,
             description,
-            subtasks_count: Number(subtasksCount)
+            subtasks_count: Number(subtasksCount),
+            dungeon_name: dungeon,
+            due_date: dueDate,
+            difficulty: difficulty
         });
 
         setTitle('');
         setDescription('');
         setSubtasksCount(0);
+        setDungeon('');
+        setDueDate('');
+        setDifficulty('Sencilla');
     };
 
     const handleComplete = async (taskId) => {
@@ -93,22 +102,68 @@ export default function TaskManager() {
                                 rows={2}
                             />
                         </div>
-                        <div className="flex-between invoke-btn-group">
-                            <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center' }}>
-                                <label className="input-label" style={{ marginRight: '1rem' }}>Difficulty (Subtasks):</label>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div className="input-group" style={{ marginBottom: 0 }}>
+                                <label className="input-label">CALABOZO (CATEGORÍA)</label>
                                 <input
-                                    type="number"
-                                    min="0"
                                     className="input-field"
-                                    style={{ width: '60px', padding: '0.5rem' }}
-                                    value={subtasksCount}
-                                    onChange={e => setSubtasksCount(e.target.value)}
+                                    placeholder="Ej. Castillo Oscuro..."
+                                    value={dungeon}
+                                    onChange={e => setDungeon(e.target.value)}
                                 />
-                                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
-                                    (5+ = BOSS BATTLE)
-                                </span>
                             </div>
-                            <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
+                            <div className="input-group" style={{ marginBottom: 0 }}>
+                                <label className="input-label">FECHA LÍMITE</label>
+                                <input
+                                    type="date"
+                                    className="input-field"
+                                    style={{ fontFamily: '"Press Start 2P", cursive', fontSize: '0.6rem' }}
+                                    value={dueDate}
+                                    onChange={e => setDueDate(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex-between invoke-btn-group" style={{ alignItems: 'flex-end' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center' }}>
+                                    <label className="input-label" style={{ marginRight: '1rem', width: '120px' }}>Difficulty:</label>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            type="button"
+                                            className="btn"
+                                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.6rem', background: difficulty === 'Sencilla' ? '#fbbf24' : '#334155', color: difficulty === 'Sencilla' ? '#000' : '#fff' }}
+                                            onClick={() => setDifficulty('Sencilla')}
+                                        >
+                                            SENCILLA
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn"
+                                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.6rem', background: difficulty === 'Compleja' ? '#ef4444' : '#334155', color: difficulty === 'Compleja' ? '#000' : '#fff' }}
+                                            onClick={() => setDifficulty('Compleja')}
+                                        >
+                                            COMPLEJA
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center' }}>
+                                    <label className="input-label" style={{ marginRight: '1rem', width: '120px' }}>Subtasks:</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className="input-field"
+                                        style={{ width: '60px', padding: '0.5rem' }}
+                                        value={subtasksCount}
+                                        onChange={e => setSubtasksCount(e.target.value)}
+                                    />
+                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
+                                        (5+ = BOSS BATTLE)
+                                    </span>
+                                </div>
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem', height: '100%' }}>
                                 [ INVOCAR ]
                             </button>
                         </div>
@@ -148,7 +203,24 @@ export default function TaskManager() {
                                         <h3 style={{ textDecoration: task.status === 'completed' ? 'line-through' : 'none', fontSize: '0.9rem', marginBottom: '0.2rem' }}>
                                             {task.title}
                                         </h3>
-                                        {task.description && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>{task.description}</p>}
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
+                                            {task.difficulty && (
+                                                <span style={{ fontSize: '0.5rem', padding: '2px 5px', border: `1px solid ${task.difficulty === 'Compleja' ? '#ef4444' : '#fbbf24'}`, color: task.difficulty === 'Compleja' ? '#ef4444' : '#fbbf24', background: '#000' }}>
+                                                    {task.difficulty.toUpperCase()}
+                                                </span>
+                                            )}
+                                            {task.dungeon_name && (
+                                                <span style={{ fontSize: '0.5rem', padding: '2px 5px', border: '1px solid var(--text-muted)', color: 'var(--text-secondary)', background: '#000' }}>
+                                                    {task.dungeon_name.toUpperCase()}
+                                                </span>
+                                            )}
+                                            {task.due_date && (
+                                                <span style={{ fontSize: '0.5rem', padding: '2px 5px', border: '1px solid var(--text-muted)', color: 'var(--text-secondary)', background: '#000' }}>
+                                                    DOOM: {task.due_date}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {task.description && <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: '1.4', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{task.description}</p>}
                                     </div>
                                     <div style={{ textAlign: 'right', fontSize: '0.7rem' }}>
                                         <div style={{ color: task.monster_color || (task.is_project ? 'var(--danger)' : 'var(--warning)'), display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end', marginBottom: '0.2rem' }}>
