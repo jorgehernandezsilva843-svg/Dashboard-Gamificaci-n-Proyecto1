@@ -25,10 +25,11 @@ export default function TaskManager() {
         setTaskNote(task.description || '');
     };
 
-    const handleSaveNote = () => {
+    const handleSaveNote = async () => {
         if (selectedTask) {
-            updateTask(selectedTask.id, { description: taskNote });
-            setSelectedTask({ ...selectedTask, description: taskNote });
+            console.log('Guardando notas en BD...', taskNote);
+            await updateTask(selectedTask.id, { description: taskNote });
+            setSelectedTask(null);
         }
     };
 
@@ -128,7 +129,7 @@ export default function TaskManager() {
                             </div>
                         </div>
 
-                        <div className="flex-between invoke-btn-group" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-between w-full mt-4">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minWidth: '250px' }}>
                                 <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                                     <label className="input-label" style={{ width: '120px' }}>Difficulty:</label>
@@ -418,6 +419,21 @@ export default function TaskManager() {
                                     <X size={24} />
                                 </button>
                             </div>
+
+                            {selectedTask.subtasks_names && selectedTask.subtasks_names.length > 0 && (
+                                <div style={{ marginBottom: '1.5rem', background: '#0f172a', padding: '1rem', border: '2px solid #334155' }}>
+                                    <h4 style={{ fontSize: '0.8rem', color: 'var(--text-primary)', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Zap size={14} /> SUBTAREAS REGISTRADAS
+                                    </h4>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        {selectedTask.subtasks_names.map((st, i) => (
+                                            <div key={i} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <span style={{ color: 'var(--accent-primary)' }}>- [ ]</span> {st}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="input-group">
                                 <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
