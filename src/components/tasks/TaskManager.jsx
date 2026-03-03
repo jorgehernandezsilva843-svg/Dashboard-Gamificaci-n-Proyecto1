@@ -122,7 +122,7 @@ export default function TaskManager() {
                                 <input
                                     type="date"
                                     className="input-field w-full min-w-0 box-border"
-                                    style={{ fontFamily: '"Press Start 2P", cursive', fontSize: '0.65rem', padding: '0.8rem 0.5rem' }}
+                                    style={{ fontFamily: '"Press Start 2P", cursive', fontSize: '0.65rem', padding: '0.8rem 0.5rem', backgroundColor: '#000', color: '#fff', colorScheme: 'dark' }}
                                     value={dueDate}
                                     onChange={e => setDueDate(e.target.value)}
                                 />
