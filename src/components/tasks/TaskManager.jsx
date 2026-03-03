@@ -86,7 +86,7 @@ export default function TaskManager() {
                     <h1 className="text-gradient" style={{ textShadow: '2px 2px #000' }}>Bestiary</h1>
                     <p style={{ color: 'var(--text-secondary)', marginTop: '-1rem' }}>Slay tasks to gain XP, Coins, and Items.</p>
 
-                    <form onSubmit={handleAddTask} className="pixel-corners" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--bg-secondary)', border: 'var(--pixel-border)' }}>
+                    <form onSubmit={handleAddTask} className="pixel-corners w-[90vw] max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden box-border" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--bg-secondary)', border: 'var(--pixel-border)' }}>
                         <div className="input-group">
                             <label className="input-label">SUMMON NEW MONSTER (TASK)</label>
                             <input
@@ -117,11 +117,11 @@ export default function TaskManager() {
                                     onChange={e => setDungeon(e.target.value)}
                                 />
                             </div>
-                            <div className="input-group w-full max-w-full box-border" style={{ marginBottom: 0 }}>
+                            <div className="input-group w-full max-w-full overflow-hidden" style={{ marginBottom: 0 }}>
                                 <label className="input-label">FECHA LÍMITE</label>
                                 <input
                                     type="date"
-                                    className="input-field w-full max-w-full box-border text-[0.6rem] md:text-xs"
+                                    className="w-full max-w-full box-border text-xs sm:text-sm p-2 bg-transparent border-2 border-white"
                                     style={{ fontFamily: '"Press Start 2P", cursive' }}
                                     value={dueDate}
                                     onChange={e => setDueDate(e.target.value)}
@@ -158,11 +158,11 @@ export default function TaskManager() {
                                         <span>Subtasks:</span>
                                         <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>(5+ = BOSS BATTLE)</span>
                                     </label>
-                                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <div className="flex flex-row w-full gap-2 items-center max-w-full overflow-hidden" style={{ marginBottom: '0.5rem' }}>
                                         <input
                                             type="text"
-                                            className="input-field w-full"
-                                            style={{ padding: '0.5rem', fontSize: '0.8rem' }}
+                                            className="input-field flex-1 min-w-0 w-full box-border text-xs sm:text-sm"
+                                            style={{ padding: '0.5rem', fontFamily: '"Press Start 2P", cursive' }}
                                             placeholder="Nombre de subtarea..."
                                             value={currentSubtask}
                                             onChange={e => setCurrentSubtask(e.target.value)}
@@ -178,8 +178,8 @@ export default function TaskManager() {
                                         />
                                         <button
                                             type="button"
-                                            className="btn"
-                                            style={{ background: '#3b82f6', color: '#fff', padding: '0 1rem' }}
+                                            className="btn shrink-0 text-xs sm:text-sm p-2"
+                                            style={{ background: '#3b82f6', color: '#fff' }}
                                             onClick={() => {
                                                 if (currentSubtask.trim()) {
                                                     setSubtasks([...subtasks, currentSubtask.trim()]);
