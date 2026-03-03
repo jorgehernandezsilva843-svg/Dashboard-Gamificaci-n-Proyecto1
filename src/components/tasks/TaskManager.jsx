@@ -111,18 +111,18 @@ export default function TaskManager() {
                             <div className="input-group" style={{ marginBottom: 0 }}>
                                 <label className="input-label">CALABOZO (CATEGORÍA)</label>
                                 <input
-                                    className="input-field"
+                                    className="input-field w-full min-w-0 box-border"
                                     placeholder="Ej. Castillo Oscuro..."
                                     value={dungeon}
                                     onChange={e => setDungeon(e.target.value)}
                                 />
                             </div>
-                            <div className="input-group w-full max-w-full overflow-hidden" style={{ marginBottom: 0 }}>
+                            <div className="input-group" style={{ marginBottom: 0, width: '100%', minWidth: 0, overflow: 'hidden' }}>
                                 <label className="input-label">FECHA LÍMITE</label>
                                 <input
                                     type="date"
-                                    className="w-full max-w-full box-border text-xs sm:text-sm p-2 bg-transparent border-2 border-white"
-                                    style={{ fontFamily: '"Press Start 2P", cursive' }}
+                                    className="input-field w-full min-w-0 box-border"
+                                    style={{ fontFamily: '"Press Start 2P", cursive', fontSize: '0.65rem', padding: '0.8rem 0.5rem' }}
                                     value={dueDate}
                                     onChange={e => setDueDate(e.target.value)}
                                 />
@@ -158,11 +158,11 @@ export default function TaskManager() {
                                         <span>Subtasks:</span>
                                         <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>(5+ = BOSS BATTLE)</span>
                                     </label>
-                                    <div className="flex flex-row w-full gap-2 items-center max-w-full overflow-hidden" style={{ marginBottom: '0.5rem' }}>
+                                    <div className="flex flex-row w-full gap-2 items-center" style={{ marginBottom: '0.5rem', flexWrap: 'nowrap' }}>
                                         <input
                                             type="text"
-                                            className="input-field flex-1 min-w-0 w-full box-border text-xs sm:text-sm"
-                                            style={{ padding: '0.5rem', fontFamily: '"Press Start 2P", cursive' }}
+                                            className="input-field"
+                                            style={{ padding: '0.6rem', fontFamily: '"Press Start 2P", cursive', width: '100%', minWidth: 0, flex: 1, boxSizing: 'border-box', fontSize: '0.7rem' }}
                                             placeholder="Nombre de subtarea..."
                                             value={currentSubtask}
                                             onChange={e => setCurrentSubtask(e.target.value)}
@@ -178,8 +178,8 @@ export default function TaskManager() {
                                         />
                                         <button
                                             type="button"
-                                            className="btn shrink-0 text-xs sm:text-sm p-2"
-                                            style={{ background: '#3b82f6', color: '#fff' }}
+                                            className="btn"
+                                            style={{ background: '#3b82f6', color: '#fff', flexShrink: 0, padding: '0.6rem 1rem' }}
                                             onClick={() => {
                                                 if (currentSubtask.trim()) {
                                                     setSubtasks([...subtasks, currentSubtask.trim()]);
