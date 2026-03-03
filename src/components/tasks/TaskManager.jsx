@@ -107,7 +107,7 @@ export default function TaskManager() {
                             />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                        <div className="flex flex-col sm:grid sm:grid-cols-2 gap-4 w-full mb-4">
                             <div className="input-group" style={{ marginBottom: 0 }}>
                                 <label className="input-label">CALABOZO (CATEGORÍA)</label>
                                 <input
@@ -130,7 +130,7 @@ export default function TaskManager() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-between w-full mt-4">
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minWidth: '250px' }}>
+                            <div className="flex flex-col gap-4 flex-1 min-w-0 w-full">
                                 <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                                     <label className="input-label" style={{ width: '120px' }}>Difficulty:</label>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -207,7 +207,7 @@ export default function TaskManager() {
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', alignSelf: 'flex-end', minWidth: '150px' }}>
+                            <button type="submit" className="btn btn-primary w-full sm:w-auto mt-2 sm:mt-0" style={{ padding: '0.8rem 1.5rem' }}>
                                 [ INVOCAR ]
                             </button>
                         </div>
