@@ -100,7 +100,7 @@ export function GameProvider({ children, session }) {
     };
 
     const addTask = async (taskData) => {
-        const isProject = taskData.subtasks_count >= 5;
+        const isProject = (taskData.subtasks_names && taskData.subtasks_names.length >= 5) || taskData.subtasks_count >= 5;
 
         let monster;
         let hp = 100;
@@ -123,6 +123,7 @@ export function GameProvider({ children, session }) {
             title: taskData.title,
             description: taskData.description,
             subtasks_count: taskData.subtasks_count,
+            subtasks_names: taskData.subtasks_names || [],
             dungeon_name: taskData.dungeon_name || '',
             due_date: taskData.due_date || null,
             difficulty: taskData.difficulty || 'Sencilla',
@@ -149,6 +150,7 @@ export function GameProvider({ children, session }) {
                 title: taskData.title,
                 description: taskData.description,
                 subtasks_count: taskData.subtasks_count,
+                subtasks_names: taskData.subtasks_names || [],
                 dungeon_name: taskData.dungeon_name || '',
                 due_date: taskData.due_date || null,
                 difficulty: taskData.difficulty || 'Sencilla',

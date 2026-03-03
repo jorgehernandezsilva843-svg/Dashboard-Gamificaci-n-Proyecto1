@@ -10,7 +10,8 @@ export default function TaskManager() {
     const { showConfirm } = useModal();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [subtasksCount, setSubtasksCount] = useState(0);
+    const [subtasks, setSubtasks] = useState([]);
+    const [currentSubtask, setCurrentSubtask] = useState('');
     const [dungeon, setDungeon] = useState('');
     const [dueDate, setDueDate] = useState('');
     const [difficulty, setDifficulty] = useState('Sencilla');
@@ -46,7 +47,8 @@ export default function TaskManager() {
         await addTask({
             title,
             description,
-            subtasks_count: Number(subtasksCount),
+            subtasks_count: subtasks.length,
+            subtasks_names: subtasks,
             dungeon_name: dungeon,
             due_date: dueDate,
             difficulty: difficulty
@@ -54,7 +56,8 @@ export default function TaskManager() {
 
         setTitle('');
         setDescription('');
-        setSubtasksCount(0);
+        setSubtasks([]);
+        setCurrentSubtask('');
         setDungeon('');
         setDueDate('');
         setDifficulty('Sencilla');
@@ -113,22 +116,22 @@ export default function TaskManager() {
                                     onChange={e => setDungeon(e.target.value)}
                                 />
                             </div>
-                            <div className="input-group" style={{ marginBottom: 0 }}>
+                            <div className="input-group w-full max-w-full box-border" style={{ marginBottom: 0 }}>
                                 <label className="input-label">FECHA LÍMITE</label>
                                 <input
                                     type="date"
-                                    className="input-field"
-                                    style={{ fontFamily: '"Press Start 2P", cursive', fontSize: '0.6rem' }}
+                                    className="input-field w-full max-w-full box-border text-[0.6rem] md:text-xs"
+                                    style={{ fontFamily: '"Press Start 2P", cursive' }}
                                     value={dueDate}
                                     onChange={e => setDueDate(e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        <div className="flex-between invoke-btn-group" style={{ alignItems: 'flex-end' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center' }}>
-                                    <label className="input-label" style={{ marginRight: '1rem', width: '120px' }}>Difficulty:</label>
+                        <div className="flex-between invoke-btn-group" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minWidth: '250px' }}>
+                                <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                    <label className="input-label" style={{ width: '120px' }}>Difficulty:</label>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button
                                             type="button"
@@ -148,22 +151,62 @@ export default function TaskManager() {
                                         </button>
                                     </div>
                                 </div>
-                                <div className="input-group" style={{ marginBottom: 0, flexDirection: 'row', alignItems: 'center' }}>
-                                    <label className="input-label" style={{ marginRight: '1rem', width: '120px' }}>Subtasks:</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        className="input-field"
-                                        style={{ width: '60px', padding: '0.5rem' }}
-                                        value={subtasksCount}
-                                        onChange={e => setSubtasksCount(e.target.value)}
-                                    />
-                                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: '1rem' }}>
-                                        (5+ = BOSS BATTLE)
-                                    </span>
+
+                                <div className="input-group w-full max-w-full box-border" style={{ marginBottom: 0 }}>
+                                    <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span>Subtasks:</span>
+                                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>(5+ = BOSS BATTLE)</span>
+                                    </label>
+                                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <input
+                                            type="text"
+                                            className="input-field w-full"
+                                            style={{ padding: '0.5rem', fontSize: '0.8rem' }}
+                                            placeholder="Nombre de subtarea..."
+                                            value={currentSubtask}
+                                            onChange={e => setCurrentSubtask(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    if (currentSubtask.trim()) {
+                                                        setSubtasks([...subtasks, currentSubtask.trim()]);
+                                                        setCurrentSubtask('');
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn"
+                                            style={{ background: '#3b82f6', color: '#fff', padding: '0 1rem' }}
+                                            onClick={() => {
+                                                if (currentSubtask.trim()) {
+                                                    setSubtasks([...subtasks, currentSubtask.trim()]);
+                                                    setCurrentSubtask('');
+                                                }
+                                            }}
+                                        >
+                                            [+]
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                        {subtasks.map((st, i) => (
+                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#1e293b', padding: '0.4rem 0.8rem', border: '2px solid #334155' }}>
+                                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>- {st}</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn"
+                                                    style={{ padding: '0.1rem 0.4rem', fontSize: '0.6rem', background: '#ef4444', color: '#fff' }}
+                                                    onClick={() => setSubtasks(subtasks.filter((_, index) => index !== i))}
+                                                >
+                                                    [X]
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                            <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem', height: '100%' }}>
+                            <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 1.5rem', alignSelf: 'flex-end', minWidth: '150px' }}>
                                 [ INVOCAR ]
                             </button>
                         </div>
